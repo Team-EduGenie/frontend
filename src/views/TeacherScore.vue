@@ -121,7 +121,7 @@ export default {
         console.log('교사 ID:', teacherId);
 
         // 선택된 학생의 성적을 가져옵니다
-        const response = await axiosInst.get(`/api/student-diff/teacher/${teacherId}`);
+        const response = await axiosInst.get(`/student-diff/teacher/${teacherId}`);
         console.log('성적 응답:', response.data);
         
         // 선택된 학생의 성적만 필터링하고 필요한 데이터만 추출
@@ -134,7 +134,7 @@ export default {
           }));
         
         // 과목 목록을 가져옵니다
-        const subjectsResponse = await axiosInst.get('subjects');
+        const subjectsResponse = await axiosInst.get('/subjects');
         console.log('과목 응답:', subjectsResponse.data);
         this.subjects = subjectsResponse.data;
         

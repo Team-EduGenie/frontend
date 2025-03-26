@@ -51,7 +51,7 @@ export default {
       const teacherId = localStorage.getItem('teacherId');
       if (teacherId) {
         try {
-          const res = await axiosInst.get(`api/students/teacher/${teacherId}`);
+          const res = await axiosInst.get(`/students/teacher/${teacherId}`);
           students.value = res.data;
         } catch (error) {
           console.error('Error fetching students:', error);
@@ -63,7 +63,7 @@ export default {
       const teacherId = localStorage.getItem('teacherId');
       if (teacherId) {
         try {
-          const res = await axiosInst.post('api/students', {
+          const res = await axiosInst.post('/students', {
             studentName: newStudentName.value,
             teacher: { teacherId: teacherId }
           });

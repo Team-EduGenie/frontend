@@ -100,7 +100,7 @@ export default {
     async generateQuiz() {
       try {
         console.log('문제 생성 요청 시작');
-        const response = await axiosInst.post('api/custom-quiz/generate-with-prompt', {
+        const response = await axiosInst.post('/custom-quiz/generate-with-prompt', {
           prompt: this.userPrompt
         });
         console.log('문제 생성 응답:', response.data);

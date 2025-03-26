@@ -93,7 +93,7 @@
         
         if (this.isCorrect) {
           try {
-            await axiosInst.post('api/student-diff/increment-score', {
+            await axiosInst.post('/student-diff/increment-score', {
               studentId: studentData.studentId,
               unitId: this.$route.query.unitId
             });
@@ -114,7 +114,7 @@
             this.isFinished = true;
             try {
               // 최종 점수 조회
-              const response = await axiosInst.get('api/student-diff/score', {
+              const response = await axiosInst.get('/student-diff/score', {
                 params: {
                   studentId: studentData.studentId,
                   unitId: this.$route.query.unitId
@@ -123,7 +123,7 @@
               this.score = response.data.score;
   
               // 난이도 업데이트
-              await axiosInst.post('api/quizzes/submit', {
+              await axiosInst.post('/quizzes/submit', {
                 studentId: studentData.studentId,
                 unitId: this.$route.query.unitId,
                 totalQuestions: this.quizzes.length,
@@ -152,7 +152,7 @@
         
         // 현재 난이도 가져오기
         try {
-          const diffResponse = await axiosInst.get('/api/student-diff/score', {
+          const diffResponse = await axiosInst.get('/student-diff/score', {
             params: {
               studentId: studentData.studentId,
               unitId: unitId
@@ -164,7 +164,7 @@
         
         // 점수 초기화
         try {
-          await axiosInst.post('/api/student-diff/reset-score', {
+          await axiosInst.post('/student-diff/reset-score', {
             studentId: studentData.studentId,
             unitId: unitId
           });
@@ -174,7 +174,7 @@
         }
 
         // 현재 난이도에 맞는 퀴즈 가져오기
-        const response = await axiosInst.get('/api/quizzes', {
+        const response = await axiosInst.get('/quizzes', {
           params: {
             studentId: studentData.studentId,
             unitId: unitId

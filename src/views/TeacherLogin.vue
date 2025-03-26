@@ -52,7 +52,7 @@ export default {
       }
 
       try {
-        const response = await axiosInst.post('/teachers/', {
+        const response = await axiosInst.post('/teachers', {
           teacherName: this.teacherName.trim()
         });
 

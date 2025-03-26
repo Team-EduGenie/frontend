@@ -4,7 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
@@ -18,11 +17,10 @@ export default defineConfig({
   server: {
     cors: true,
     proxy: {
-      "/api": {
+      "/api/v1/": {
         target: "http://localhost:8080",
         secure : false,
-        changeOrigin: true,
-        rewrite : (path) => {return path.replace(/^\/api/, '')}
+        changeOrigin: true
       }
     }
   }

@@ -61,7 +61,7 @@ export default {
       }
 
       try {
-        const response = await axiosInst.post('api/students/login', { student_name: this.studentName });
+        const response = await axiosInst.post('/students/login', { student_name: this.studentName });
         if (response.data) {
           localStorage.setItem('lastStudentName', this.studentName);
           localStorage.setItem('student', JSON.stringify(response.data));

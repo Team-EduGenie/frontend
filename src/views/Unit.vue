@@ -70,7 +70,7 @@ export default {
         }
 
         // 해당 단원의 현재 난이도 가져오기
-        const response = await axiosInst.get('/api/student-diff/score', {
+        const response = await axiosInst.get('/student-diff/score', {
           params: {
             studentId: studentData.studentId,
             unitId: unit.unitId
@@ -112,7 +112,7 @@ export default {
         const difficulties = {};
         for (const unit of this.units) {
           try {
-            const response = await axiosInst.get('/api/student-diff/score', {
+            const response = await axiosInst.get('/student-diff/score', {
               params: {
                 studentId: studentData.studentId,
                 unitId: unit.unitId

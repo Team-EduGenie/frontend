@@ -36,7 +36,7 @@ export default {
     async fetchStudents() {
       try {
         const teacherId = localStorage.getItem('teacherId');
-        const response = await axiosInst.get(`api/students/teacher/${teacherId}`);
+        const response = await axiosInst.get(`/students/teacher/${teacherId}`);
         this.students = response.data;
       } catch (error) {
         console.error('학생 목록 조회 실패:', error);

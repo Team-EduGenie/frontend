@@ -77,7 +77,7 @@ export default {
       try {
         console.log('문제 생성 요청 시작');
         const quizType = this.$route.query.type || 'riddle';
-        const response = await axiosInst.get('/api/custom-quiz/generate', {
+        const response = await axiosInst.get('/custom-quiz/generate', {
           params: { type: quizType }
         });
         console.log('문제 생성 응답:', response.data);
