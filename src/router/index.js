@@ -1,19 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import StudentLogin from '@/views/StudentLogin.vue'
+import StudentSignin from '@/views/StudentSignin.vue'
 import StudentManage from '../views/StudentManage.vue'
-import TeacherLogin from '../views/TeacherLogin.vue'
 import TeacherMenu from '../views/TeacherMenu.vue'
 import StudentMenu from '@/views/StudentMenu.vue'
-import StudentLogin from '@/views/StudentLogin.vue'
 import Unit from '@/views/Unit.vue'
 import Quiz from '@/views/Quiz.vue'
-import TeacherScore from '../views/TeacherScore.vue'
+import StudentDashboard from '@/views/StudentDashboard.vue'
 import TeacherSubject from '../views/TeacherSubject.vue'
-import CustomQuizMenu from '../views/CustomQuizMenu.vue'
-import CustomQuiz from '../views/CustomQuiz.vue'
 import Subject from '../views/Subject.vue'
-import CustomPromptQuiz from '../views/CustomPromptQuiz.vue'
-import TeacherStudentSelect from '../views/TeacherStudentSelect.vue'
+import DailyQuiz from '@/views/DailyQuiz.vue'
+import PointShop from '@/views/PointShop.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,14 +22,14 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/signup',
+      name: 'signup',
+      component: StudentSignin
+    },
+    {
       path: '/students',
       name: 'students',
       component: StudentManage
-    },
-    {
-      path: '/teacherlogin',
-      name: 'teacherlogin',
-      component: TeacherLogin
     },
     {
       path: '/teachermenu',
@@ -69,29 +67,19 @@ const router = createRouter({
       component: TeacherSubject
     },
     {
-      path: '/teacherscore',
-      name: 'teacherscore',
-      component: TeacherScore
+      path: '/student-dashboard',
+      name: 'student-dashboard',
+      component: StudentDashboard
     },
     {
-      path: '/custom-quiz-menu',
-      name: 'custom-quiz-menu',
-      component: CustomQuizMenu
+      path: '/daily-quiz',
+      name: 'daily-quiz',
+      component: DailyQuiz
     },
     {
-      path: '/custom-quiz',
-      name: 'custom-quiz',
-      component: CustomQuiz
-    },
-    {
-      path: '/custom-prompt-quiz',
-      name: 'custom-prompt-quiz',
-      component: CustomPromptQuiz
-    },
-    {
-      path: '/teacherstudentselect',
-      name: 'teacherstudentselect',
-      component: TeacherStudentSelect
+      path: '/point-shop',
+      name: 'point-shop',
+      component: PointShop
     }
   ]
 })
