@@ -8,22 +8,29 @@
       <button @click="goToSubject" class="menu-button subject">
         <span class="button-icon">📚</span>
         <div class="button-content">
-          <span class="button-title">과목 선택</span>
+          <span class="button-title">과목 퀴즈</span>
           <span class="button-description">공부하고 싶은 과목을 골라보세요</span>
         </div>
       </button>
-      <button @click="goToCustomQuiz" class="menu-button custom">
-        <span class="button-icon">✨</span>
+      <button @click="goToDailyChallenge" class="menu-button challenge">
+        <span class="button-icon">🎯</span>
         <div class="button-content">
-          <span class="button-title">맞춤형 문제</span>
-          <span class="button-description">나에게 딱 맞는 문제를 풀어보아요</span>
+          <span class="button-title">일일 챌린지</span>
+          <span class="button-description">매일 새로운 도전을 시작해보세요</span>
         </div>
       </button>
-      <button @click="goToCustomPromptQuiz" class="menu-button create">
-        <span class="button-icon">🎨</span>
+      <button @click="goToScore" class="menu-button score">
+        <span class="button-icon">📊</span>
         <div class="button-content">
-          <span class="button-title">내가 만드는 문제</span>
-          <span class="button-description">직접 문제를 만들어보아요</span>
+          <span class="button-title">성적 확인</span>
+          <span class="button-description">나의 학습 현황을 확인해보세요</span>
+        </div>
+      </button>
+      <button @click="goToPointShop" class="menu-button shop">
+        <span class="button-icon">🛍️</span>
+        <div class="button-content">
+          <span class="button-title">포인트 샵</span>
+          <span class="button-description">포인트로 특별한 아이템을 구매해보세요</span>
         </div>
       </button>
       <button @click="logout" class="menu-button logout">
@@ -58,11 +65,14 @@ export default {
     goToSubject() {
       this.$router.push('/subject');
     },
-    goToCustomQuiz() {
-      this.$router.push('/custom-quiz-menu');
+    goToDailyChallenge() {
+      this.$router.push('/daily-quiz');
     },
-    goToCustomPromptQuiz() {
-      this.$router.push('/custom-prompt-quiz');
+    goToScore() {
+      this.$router.push('/student-dashboard');
+    },
+    goToPointShop() {
+      this.$router.push('/point-shop');
     },
     logout() {
       localStorage.removeItem('student');
@@ -181,8 +191,9 @@ h1 {
 }
 
 .subject:hover { border-color: #4CAF50; }
-.custom:hover { border-color: #9C27B0; }
-.create:hover { border-color: #FF9800; }
+.challenge:hover { border-color: #FF9800; }
+.score:hover { border-color: #2196F3; }
+.shop:hover { border-color: #9C27B0; }
 .logout:hover { border-color: #ff6b6b; }
 
 .decoration {

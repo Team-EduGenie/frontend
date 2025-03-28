@@ -1,17 +1,35 @@
 <template>
-  <div class="login-view">
+  <div class="signin-view">
     <div class="header">
-      <h1>안녕하세요! 👋</h1>
-      <p class="subtitle">아이디와 비밀번호를 입력해주세요</p>
+      <h1>회원가입 🎉</h1>
+      <p class="subtitle">새로운 친구를 모집합니다!</p>
     </div>
-    <div class="login-form">
+    <div class="signin-form">
       <div class="input-wrapper">
         <span class="input-icon">👤</span>
         <input 
           type="text" 
+          v-model="studentName" 
+          placeholder="이름을 입력해주세요" 
+          class="signin-input"
+        >
+      </div>
+      <div class="input-wrapper">
+        <span class="input-icon">🆔</span>
+        <input 
+          type="text" 
           v-model="studentId" 
           placeholder="아이디를 입력해주세요" 
-          class="login-input"
+          class="signin-input"
+        >
+      </div>
+      <div class="input-wrapper">
+        <span class="input-icon">🎂</span>
+        <input 
+          type="number" 
+          v-model="age" 
+          placeholder="나이를 입력해주세요" 
+          class="signin-input"
         >
       </div>
       <div class="input-wrapper">
@@ -20,25 +38,26 @@
           type="password" 
           v-model="password" 
           placeholder="비밀번호를 입력해주세요" 
-          class="login-input"
-          @keyup.enter="handleLogin"
+          class="signin-input"
         >
       </div>
-      <button @click="handleLogin" class="login-button">
-        <span class="button-text">로그인</span>
-        <span class="button-icon">🔑</span>
+      <div class="input-wrapper">
+        <span class="input-icon">🔒</span>
+        <input 
+          type="password" 
+          v-model="confirmPassword" 
+          placeholder="비밀번호를 다시 입력해주세요" 
+          class="signin-input"
+        >
+      </div>
+      <button @click="handleSignin" class="signin-button">
+        <span class="button-text">가입하기</span>
+        <span class="button-icon">✨</span>
       </button>
       <p v-if="errorMessage" class="error-message">
         <span class="error-icon">😅</span>
         {{ errorMessage }}
       </p>
-      <div v-if="lastStudentName" class="recent-login">
-        <p class="recent-text">최근 로그인한 친구</p>
-        <button @click="loginWithRecentUser" class="recent-button">
-          <span class="recent-icon">👋</span>
-          {{ lastStudentName }}
-        </button>
-      </div>
     </div>
     <div class="decoration">
       <span class="deco-item pencil">✏️</span>
@@ -54,53 +73,61 @@
 import axiosInst from '../axios'
 
 export default {
-  name: 'StudentLogin',
+  name: 'StudentSignin',
   data() {
     return {
+      studentName: '',
       studentId: '',
+      age: '',
       password: '',
-      errorMessage: '',
-      lastStudentName: ''
+      confirmPassword: '',
+      errorMessage: ''
     }
   },
   methods: {
-    async handleLogin() {
-      if (!this.studentId.trim() || !this.password.trim()) {
-        this.errorMessage = '아이디와 비밀번호를 모두 입력해주세요.';
+    async handleSignin() {
+      // 입력값 검증
+      if (!this.studentName.trim() || !this.studentId.trim() || !this.age || !this.password || !this.confirmPassword) {
+        this.errorMessage = '모든 항목을 입력해주세요.';
+        return;
+      }
+
+      if (this.password !== this.confirmPassword) {
+        this.errorMessage = '비밀번호가 일치하지 않습니다.';
+        return;
+      }
+
+      if (this.password.length < 6) {
+        this.errorMessage = '비밀번호는 6자 이상이어야 합니다.';
         return;
       }
 
       try {
-        const response = await axiosInst.post('/students/login', { 
+        const response = await axiosInst.post('/students/signup', {
+          student_name: this.studentName,
           student_id: this.studentId,
-          password: this.password 
+          age: parseInt(this.age),
+          password: this.password
         });
+
         if (response.data) {
-          localStorage.setItem('lastStudentName', this.studentId);
-          localStorage.setItem('student', JSON.stringify(response.data));
-          this.$router.push('/studentmenu');
+          alert('회원가입이 완료되었습니다!');
+          this.$router.push('/studentlogin');
         }
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          this.errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.';
+        if (error.response && error.response.status === 409) {
+          this.errorMessage = '이미 사용 중인 아이디입니다.';
         } else {
-          this.errorMessage = '로그인 중 오류가 발생했습니다.';
+          this.errorMessage = '회원가입 중 오류가 발생했습니다.';
         }
       }
-    },
-    async loginWithRecentUser() {
-      this.studentId = this.lastStudentName;
-      await this.handleLogin();
     }
-  },
-  created() {
-    this.lastStudentName = localStorage.getItem('lastStudentName');
   }
 }
 </script>
 
 <style scoped>
-.login-view {
+.signin-view {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,10 +168,10 @@ h1 {
   width: fit-content;
 }
 
-.login-form {
+.signin-form {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
   width: 100%;
   max-width: 400px;
   position: relative;
@@ -168,9 +195,9 @@ h1 {
   pointer-events: none;
 }
 
-.login-input {
-  padding: 20px 20px 20px 60px;
-  font-size: 1.3em;
+.signin-input {
+  padding: 15px 15px 15px 60px;
+  font-size: 1.2em;
   border: 3px solid #ffc9c9;
   border-radius: 25px;
   width: 100%;
@@ -180,18 +207,18 @@ h1 {
   text-align: center;
 }
 
-.login-input:focus {
+.signin-input:focus {
   outline: none;
   border-color: #ff8787;
   box-shadow: 0 0 15px rgba(255,135,135,0.3);
 }
 
-.login-input::placeholder {
+.signin-input::placeholder {
   color: #adb5bd;
   text-align: center;
 }
 
-.login-button {
+.signin-button {
   padding: 20px 30px;
   font-size: 1.4em;
   background-color: #ff8787;
@@ -207,9 +234,10 @@ h1 {
   box-shadow: 0 5px 15px rgba(255,135,135,0.4);
   text-align: center;
   width: 100%;
+  margin-top: 20px;
 }
 
-.login-button:hover {
+.signin-button:hover {
   background-color: #ff6b6b;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255,135,135,0.5);
@@ -224,7 +252,7 @@ h1 {
   transition: transform 0.3s ease;
 }
 
-.login-button:hover .button-icon {
+.signin-button:hover .button-icon {
   transform: translateX(5px) rotate(15deg);
 }
 
@@ -239,6 +267,7 @@ h1 {
   background-color: rgba(255,107,107,0.1);
   padding: 15px;
   border-radius: 15px;
+  margin-top: 10px;
 }
 
 .error-icon {
@@ -278,16 +307,16 @@ h1 {
     font-size: 1.3em;
   }
 
-  .login-input {
-    font-size: 1.2em;
-    padding: 15px 15px 15px 50px;
+  .signin-input {
+    font-size: 1.1em;
+    padding: 12px 12px 12px 50px;
   }
 
   .input-icon {
-    font-size: 1.3em;
+    font-size: 1.2em;
   }
 
-  .login-button {
+  .signin-button {
     font-size: 1.3em;
     padding: 15px 25px;
   }
@@ -295,45 +324,5 @@ h1 {
   .deco-item {
     font-size: 2em;
   }
-}
-
-.recent-login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.recent-text {
-  color: #ff8787;
-  font-size: 1.1em;
-  margin-bottom: 5px;
-}
-
-.recent-button {
-  padding: 12px 25px;
-  font-size: 1.2em;
-  background-color: #fff5f5;
-  color: #ff6b6b;
-  border: 2px solid #ffc9c9;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(255,107,107,0.2);
-}
-
-.recent-button:hover {
-  background-color: #ff8787;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255,107,107,0.3);
-}
-
-.recent-icon {
-  font-size: 1.2em;
 }
 </style> 

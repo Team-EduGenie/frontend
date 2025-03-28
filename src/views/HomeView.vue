@@ -5,18 +5,18 @@
       <p class="subtitle">함께 배우고 성장하는 즐거운 공간</p>
     </div>
     <div class="button-container">
-      <router-link to="/teacherlogin" class="login-button teacher">
-        <span class="button-icon">👩‍🏫</span>
+      <router-link to="/signup" class="login-button signup">
+        <span class="button-icon">📝</span>
         <div class="button-content">
-          <span class="button-title">학부모 로그인</span>
-          <span class="button-description">학부모로 입장하기</span>
+          <span class="button-title">회원가입</span>
+          <span class="button-description">새로운 계정 만들기</span>
         </div>
       </router-link>
-      <router-link to="/studentlogin" class="login-button student">
-        <span class="button-icon">👩‍🎓</span>
+      <router-link to="/Studentlogin" class="login-button login">
+        <span class="button-icon">🔑</span>
         <div class="button-content">
-          <span class="button-title">학생 로그인</span>
-          <span class="button-description">학생으로 입장하기</span>
+          <span class="button-title">로그인</span>
+          <span class="button-description">기존 계정으로 로그인</span>
         </div>
       </router-link>
     </div>
@@ -120,10 +120,12 @@ h1 {
   color: #5c6b7a;
 }
 
-.login-button:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+.login-button.signup:hover {
   border-color: #4CAF50;
+}
+
+.login-button.login:hover {
+  border-color: #2196F3;
 }
 
 .login-button:hover .button-icon {
