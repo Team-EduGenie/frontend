@@ -1,19 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import StudentManage from '../views/StudentManage.vue'
-import TeacherLogin from '../views/TeacherLogin.vue'
-import TeacherMenu from '../views/TeacherMenu.vue'
-import StudentMenu from '@/views/StudentMenu.vue'
 import StudentLogin from '@/views/StudentLogin.vue'
-import Unit from '@/views/Unit.vue'
+import StudentSignin from '@/views/StudentSignin.vue'
+import StudentManage from '../views/StudentManage.vue'
+import StudentMenu from '@/views/StudentMenu.vue'
 import Quiz from '@/views/Quiz.vue'
-import TeacherScore from '../views/TeacherScore.vue'
-import TeacherSubject from '../views/TeacherSubject.vue'
-import CustomQuizMenu from '../views/CustomQuizMenu.vue'
-import CustomQuiz from '../views/CustomQuiz.vue'
-import Subject from '../views/Subject.vue'
-import CustomPromptQuiz from '../views/CustomPromptQuiz.vue'
-import TeacherStudentSelect from '../views/TeacherStudentSelect.vue'
+import StudentDashboard from '@/views/StudentDashboard.vue'
+import Group from '@/views/Group.vue'
+import GroupManage from '@/views/GroupManage.vue'
+import Exam from '@/views/Exam.vue'
+import SubjectGroupSelect from '@/views/SubjectGroupSelect.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,19 +20,14 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/signup',
+      name: 'signup',
+      component: StudentSignin
+    },
+    {
       path: '/students',
       name: 'students',
       component: StudentManage
-    },
-    {
-      path: '/teacherlogin',
-      name: 'teacherlogin',
-      component: TeacherLogin
-    },
-    {
-      path: '/teachermenu',
-      name: 'teachermenu',
-      component: TeacherMenu
     },
     {
       path: '/studentlogin',
@@ -49,49 +40,34 @@ const router = createRouter({
       component: StudentMenu
     },
     {
-      path: '/subject',
-      name: 'subject',
-      component: Subject
-    },
-    {
-      path: '/unit',
-      name: 'unit',
-      component: Unit
-    },
-    {
       path: '/quiz',
       name: 'quiz',
       component: Quiz
     },
     {
-      path: '/teachersubject',
-      name: 'teachersubject',
-      component: TeacherSubject
+      path: '/student-dashboard',
+      name: 'student-dashboard',
+      component: StudentDashboard
     },
     {
-      path: '/teacherscore',
-      name: 'teacherscore',
-      component: TeacherScore
+      path: '/group',
+      name: 'group',
+      component: Group
     },
     {
-      path: '/custom-quiz-menu',
-      name: 'custom-quiz-menu',
-      component: CustomQuizMenu
+      path: '/group-manage',
+      name: 'group-manage',
+      component: GroupManage
     },
     {
-      path: '/custom-quiz',
-      name: 'custom-quiz',
-      component: CustomQuiz
+      path: '/exam',
+      name: 'exam',
+      component: Exam
     },
     {
-      path: '/custom-prompt-quiz',
-      name: 'custom-prompt-quiz',
-      component: CustomPromptQuiz
-    },
-    {
-      path: '/teacherstudentselect',
-      name: 'teacherstudentselect',
-      component: TeacherStudentSelect
+      path: '/subject-group-select',
+      name: 'subject-group-select',
+      component: SubjectGroupSelect
     }
   ]
 })
