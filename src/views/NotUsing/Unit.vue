@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import axiosInst from '../axios'
+import axiosInst from '../../axios'
 
 export default {
   name: 'Unit',

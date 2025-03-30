@@ -50,10 +50,16 @@
           class="signin-input"
         >
       </div>
-      <button @click="handleSignin" class="signin-button">
-        <span class="button-text">가입하기</span>
-        <span class="button-icon">✨</span>
-      </button>
+      <div class="button-group">
+        <button @click="handleSignin" class="signin-button">
+          <span class="button-text">가입하기</span>
+          <span class="button-icon">✨</span>
+        </button>
+        <button @click="goBack" class="signin-button back-button">
+          <span class="button-text">이전으로</span>
+          <span class="button-icon">⬅️</span>
+        </button>
+      </div>
       <p v-if="errorMessage" class="error-message">
         <span class="error-icon">😅</span>
         {{ errorMessage }}
@@ -121,6 +127,9 @@ export default {
           this.errorMessage = '회원가입 중 오류가 발생했습니다.';
         }
       }
+    },
+    goBack() {
+      this.$router.push('/');
     }
   }
 }
@@ -218,6 +227,14 @@ h1 {
   text-align: center;
 }
 
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  margin-top: 20px;
+}
+
 .signin-button {
   padding: 20px 30px;
   font-size: 1.4em;
@@ -234,13 +251,22 @@ h1 {
   box-shadow: 0 5px 15px rgba(255,135,135,0.4);
   text-align: center;
   width: 100%;
-  margin-top: 20px;
 }
 
 .signin-button:hover {
   background-color: #ff6b6b;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255,135,135,0.5);
+}
+
+.back-button {
+  background-color: #6c757d;
+  box-shadow: 0 5px 15px rgba(108,117,125,0.4);
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+  box-shadow: 0 8px 20px rgba(108,117,125,0.5);
 }
 
 .button-text {

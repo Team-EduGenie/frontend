@@ -5,32 +5,32 @@
       <p class="subtitle">오늘도 즐거운 공부해요!</p>
     </div>
     <div class="menu-buttons">
-      <button @click="goToSubject" class="menu-button subject">
+      <button @click="goToSubjectGroupSelect" class="menu-button subject">
         <span class="button-icon">📚</span>
         <div class="button-content">
-          <span class="button-title">과목 퀴즈</span>
-          <span class="button-description">공부하고 싶은 과목을 골라보세요</span>
+          <span class="button-title">연습 문제</span>
+          <span class="button-description">ai가 당신의 성취도를 관리해줍니다!</span>
         </div>
       </button>
-      <button @click="goToDailyChallenge" class="menu-button challenge">
-        <span class="button-icon">🎯</span>
+      <button @click="goToExam" class="menu-button exam">
+        <span class="button-icon">📝</span>
         <div class="button-content">
-          <span class="button-title">일일 챌린지</span>
-          <span class="button-description">매일 새로운 도전을 시작해보세요</span>
+          <span class="button-title">시험 치기</span>
+          <span class="button-description">오늘의 시험을 시작해보세요</span>
         </div>
       </button>
-      <button @click="goToScore" class="menu-button score">
+      <button @click="goToReview" class="menu-button score">
         <span class="button-icon">📊</span>
         <div class="button-content">
-          <span class="button-title">성적 확인</span>
-          <span class="button-description">나의 학습 현황을 확인해보세요</span>
+          <span class="button-title">복습하기</span>
+          <span class="button-description">학습한 내용을 다시 한번 확인해보세요</span>
         </div>
       </button>
-      <button @click="goToPointShop" class="menu-button shop">
-        <span class="button-icon">🛍️</span>
+      <button @click="goToGroup" class="menu-button group">
+        <span class="button-icon">👥</span>
         <div class="button-content">
-          <span class="button-title">포인트 샵</span>
-          <span class="button-description">포인트로 특별한 아이템을 구매해보세요</span>
+          <span class="button-title">그룹 만들기</span>
+          <span class="button-description">친구들과 함께 공부해보세요</span>
         </div>
       </button>
       <button @click="logout" class="menu-button logout">
@@ -62,17 +62,22 @@ export default {
     }
   },
   methods: {
-    goToSubject() {
-      this.$router.push('/subject');
+    goToSubjectGroupSelect() {
+      this.$router.push('/subject-group-select?from=practice');
     },
-    goToDailyChallenge() {
-      this.$router.push('/daily-quiz');
+    goToExam() {
+      this.$router.push('/subject-group-select?from=exam');
     },
-    goToScore() {
+    goToReview() {
+      localStorage.setItem('student', JSON.stringify({
+        id: 1,
+        name: '홍길동',
+        role: 'student'
+      }));
       this.$router.push('/student-dashboard');
     },
-    goToPointShop() {
-      this.$router.push('/point-shop');
+    goToGroup() {
+      this.$router.push('/group');
     },
     logout() {
       localStorage.removeItem('student');
@@ -191,9 +196,9 @@ h1 {
 }
 
 .subject:hover { border-color: #4CAF50; }
-.challenge:hover { border-color: #FF9800; }
+.exam:hover { border-color: #FF9800; }
 .score:hover { border-color: #2196F3; }
-.shop:hover { border-color: #9C27B0; }
+.group:hover { border-color: #9C27B0; }
 .logout:hover { border-color: #ff6b6b; }
 
 .decoration {

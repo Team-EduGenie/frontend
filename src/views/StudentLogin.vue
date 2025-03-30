@@ -9,7 +9,7 @@
         <span class="input-icon">👤</span>
         <input 
           type="text" 
-          v-model="studentId" 
+          v-model="username" 
           placeholder="아이디를 입력해주세요" 
           class="login-input"
         >
@@ -51,45 +51,52 @@
 </template>
 
 <script>
-import axiosInst from '../axios'
-
 export default {
   name: 'StudentLogin',
   data() {
     return {
-      studentId: '',
+      username: '',
       password: '',
       errorMessage: '',
-      lastStudentName: ''
+      lastStudentName: '',
+      // 더미 데이터
+      dummyUsers: [
+        {
+          id: 1,
+          username: 'leader',
+          password: '1234',
+          name: '홍길동',
+          role: 'leader',
+          group: 'KT 그룹'
+        },
+        {
+          id: 2,
+          username: 'member',
+          password: '1234',
+          name: '김철수',
+          role: 'member',
+          group: 'KT 그룹'
+        }
+      ]
     }
   },
   methods: {
-    async handleLogin() {
-      if (!this.studentId.trim() || !this.password.trim()) {
-        this.errorMessage = '아이디와 비밀번호를 모두 입력해주세요.';
-        return;
-      }
+    handleLogin() {
+      // 더미 데이터에서 사용자 찾기
+      const user = this.dummyUsers.find(
+        u => u.username === this.username && u.password === this.password
+      );
 
-      try {
-        const response = await axiosInst.post('/students/login', { 
-          student_id: this.studentId,
-          password: this.password 
-        });
-        if (response.data) {
-          localStorage.setItem('lastStudentName', this.studentId);
-          localStorage.setItem('student', JSON.stringify(response.data));
-          this.$router.push('/studentmenu');
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          this.errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.';
-        } else {
-          this.errorMessage = '로그인 중 오류가 발생했습니다.';
-        }
+      if (user) {
+        // 사용자 정보를 localStorage에 저장
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.$router.push('/studentmenu');
+      } else {
+        alert('아이디 또는 비밀번호가 일치하지 않습니다.');
       }
     },
     async loginWithRecentUser() {
-      this.studentId = this.lastStudentName;
+      this.username = this.lastStudentName;
       await this.handleLogin();
     }
   },
