@@ -59,8 +59,24 @@
           <h3>문제 정보</h3>
           <div class="problem-info">
             <div class="input-group">
-              <label for="problemName">문제 이름</label>
-              <input type="text" id="problemName" v-model="problemName" placeholder="문제 이름을 입력하세요">
+              <label for="subject">문제 세트 선택</label>
+              <div class="subject-select">
+                <div class="subject-list">
+                  <div 
+                    v-for="subject in subjects" 
+                    :key="subject.id"
+                    class="subject-item"
+                    :class="{ 'selected': selectedSubject === subject.id }"
+                    @click="selectSubject(subject.id)"
+                  >
+                    {{ subject.name }}
+                  </div>
+                </div>
+                <button @click="showNewSubjectPopup = true" class="new-subject-btn">
+                  <span class="button-icon">➕</span>
+                  새 문제 세트 만들기
+                </button>
+              </div>
             </div>
             <button class="create-button" @click="createProblem">
               <span class="button-icon">✨</span>
@@ -118,7 +134,24 @@
       <span class="deco-item book">📚</span>
       <span class="deco-item ruler">📏</span>
       <span class="deco-item backpack">🎒</span>
-      <span class="deco-item apple">🍎</span>
+      <span class="deco-item apple">��</span>
+    </div>
+
+    <!-- 새 문제 세트 추가 팝업 -->
+    <div v-if="showNewSubjectPopup" class="popup-overlay">
+      <div class="popup-content">
+        <h2>새 문제 세트 만들기</h2>
+        <input 
+          type="text" 
+          v-model="newSubjectName" 
+          placeholder="문제 세트 이름을 입력해주세요"
+          class="popup-input"
+        >
+        <div class="popup-buttons">
+          <button @click="cancelNewSubject" class="cancel-btn">취소</button>
+          <button @click="addNewSubject" class="confirm-btn">확인</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -131,15 +164,23 @@ export default {
       selectedFile: null,
       isDragging: false,
       uploadedFiles: [], // 업로드된 PDF 파일 목록
-      problemName: '', // 문제 이름
       isLeader: false, // 그룹장 여부
       problemSets: [], // 생성된 문제 세트 목록
+      subjects: [
+        { id: 1, name: 'KT Azure Cloud' },
+        { id: 2, name: 'KT AI' },
+        { id: 3, name: 'KT Network' },
+        { id: 4, name: 'KT Security' }
+      ],
+      selectedSubject: null,
+      showNewSubjectPopup: false,
+      newSubjectName: ''
     }
   },
   computed: {
     canCreateProblem() {
-      return this.problemName.trim() !== '' && 
-             this.uploadedFiles.some(file => file.selected);
+      return this.uploadedFiles.some(file => file.selected) &&
+             this.selectedSubject !== null;
     }
   },
   methods: {
@@ -184,9 +225,31 @@ export default {
       alert('파일이 성공적으로 업로드되었습니다!');
       this.selectedFile = null;
     },
+    selectSubject(subjectId) {
+      this.selectedSubject = subjectId;
+    },
+    addNewSubject() {
+      if (!this.newSubjectName) {
+        alert('문제 세트 이름을 입력해주세요');
+        return;
+      }
+
+      const newSubject = {
+        id: Date.now(),
+        name: this.newSubjectName
+      };
+
+      this.subjects.push(newSubject);
+      this.showNewSubjectPopup = false;
+      this.newSubjectName = '';
+    },
+    cancelNewSubject() {
+      this.showNewSubjectPopup = false;
+      this.newSubjectName = '';
+    },
     createProblem() {
-      if (!this.problemName) {
-        alert('문제 이름을 입력해주세요.');
+      if (!this.selectedSubject) {
+        alert('문제 세트를 선택해주세요.');
         return;
       }
 
@@ -196,9 +259,12 @@ export default {
         return;
       }
 
+      const selectedSubject = this.subjects.find(s => s.id === this.selectedSubject);
+
       // 문제 생성 로직
       const problem = {
-        name: this.problemName,
+        name: selectedSubject.name,
+        subject: selectedSubject.name,
         type: this.isLeader ? 'exam' : 'practice',
         pdfFiles: selectedFiles,
         createdAt: new Date().toLocaleString('ko-KR', {
@@ -215,7 +281,7 @@ export default {
       alert('문제가 생성되었습니다!');
       
       // 문제 생성 후 폼 초기화
-      this.problemName = '';
+      this.selectedSubject = null;
       this.uploadedFiles = [];
     },
     viewProblemSet(set) {
@@ -550,45 +616,56 @@ h1 {
   font-size: 1.1em;
 }
 
-#problemName {
-  width: 100%;
-  padding: 12px 20px;
+.subject-select {
+  margin-bottom: 20px;
+}
+
+.subject-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.subject-item {
+  padding: 10px 20px;
+  background-color: #fff5f5;
   border: 2px solid #ffc9c9;
-  border-radius: 15px;
-  font-size: 1.1em;
+  border-radius: 20px;
+  cursor: pointer;
   transition: all 0.3s ease;
-  background-color: white;
-  color: #2c3e50;
+  font-size: 1.1em;
+  color: #ff6b6b;
 }
 
-#problemName:focus {
-  outline: none;
-  border-color: #ff6b6b;
-  box-shadow: 0 0 0 3px rgba(255,107,107,0.1);
-  transform: translateY(-1px);
+.subject-item:hover {
+  background-color: #ffc9c9;
+  transform: translateY(-2px);
 }
 
-#problemName::placeholder {
-  color: #ffc9c9;
+.subject-item.selected {
+  background-color: #ff8787;
+  color: white;
+  border-color: #ff8787;
 }
 
-.problem-type-info {
+.new-subject-btn {
+  padding: 10px 20px;
+  background-color: #fff5f5;
+  border: 2px dashed #ffc9c9;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px;
-  background-color: #fff5f5;
-  border-radius: 12px;
-  margin: 10px 0;
-}
-
-.type-icon {
-  font-size: 1.2em;
-}
-
-.type-text {
   color: #ff6b6b;
-  font-weight: 500;
+  font-size: 1.1em;
+}
+
+.new-subject-btn:hover {
+  background-color: #ffc9c9;
+  transform: translateY(-2px);
 }
 
 .create-button {
@@ -840,11 +917,6 @@ h1 {
     margin-top: 10px;
   }
 
-  #problemName {
-    font-size: 1em;
-    padding: 10px 15px;
-  }
-
   .content-container {
     flex-direction: column;
   }
@@ -936,6 +1008,89 @@ h1 {
   .pdf-item .file-size {
     font-size: 0.85em;
     padding: 3px 10px;
+  }
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content h2 {
+  color: #ff6b6b;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.popup-input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #ffc9c9;
+  border-radius: 10px;
+  font-size: 1.1em;
+  margin-bottom: 20px;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn, .confirm-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn {
+  background-color: #fff5f5;
+  border: 2px solid #ffc9c9;
+  color: #ff6b6b;
+}
+
+.confirm-btn {
+  background-color: #ff8787;
+  border: none;
+  color: white;
+}
+
+.cancel-btn:hover, .confirm-btn:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .popup-content {
+    padding: 20px;
+    width: 95%;
+  }
+
+  .popup-input {
+    font-size: 1em;
+    padding: 12px;
+  }
+
+  .cancel-btn, .confirm-btn {
+    padding: 8px 16px;
+    font-size: 0.9em;
   }
 }
 </style> 
