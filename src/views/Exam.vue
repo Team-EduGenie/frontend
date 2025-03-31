@@ -159,9 +159,7 @@ export default {
       }
     },
     submitExam() {
-      clearInterval(this.timer)
-      alert('시험이 종료되었습니다.')
-      this.$router.push('/studentmenu')
+      this.$router.push('/exam-result');
     }
   },
   beforeDestroy() {

@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'StudentLogin',
   data() {
@@ -59,23 +61,40 @@ export default {
       password: '',
       errorMessage: '',
       lastStudentName: '',
+      showError: false,
       // 더미 데이터
       dummyUsers: [
         {
           id: 1,
-          username: 'leader',
+          username: '동세영',
           password: '1234',
-          name: '홍길동',
-          role: 'leader',
-          group: 'KT 그룹'
+          name: '동세영',
+          role: 'student',
+          groupInfo: {
+            name: 'KT Azure Study',
+            role: 'admin',
+            inviteCode: 'ABC123'
+          }
         },
         {
           id: 2,
-          username: 'member',
+          username: '홍길동',
           password: '1234',
-          name: '김철수',
-          role: 'member',
-          group: 'KT 그룹'
+          name: '홍길동',
+          role: 'student',
+          groupInfo: {
+            name: 'KT Azure Study',
+            role: 'member',
+            inviteCode: 'ABC123'
+          }
+        },
+        {
+          id: 3,
+          username: '이소민',
+          password: '1234',
+          name: '이소민',
+          role: 'student',
+          groupInfo: null
         }
       ]
     }
@@ -89,10 +108,11 @@ export default {
 
       if (user) {
         // 사용자 정보를 localStorage에 저장
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('userInfo', JSON.stringify(user));
+        // 로그인 성공 시 studentmenu로 이동
         this.$router.push('/studentmenu');
       } else {
-        alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+        this.errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.';
       }
     },
     async loginWithRecentUser() {
