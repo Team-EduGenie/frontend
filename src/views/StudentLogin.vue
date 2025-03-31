@@ -64,38 +64,9 @@ export default {
       showError: false,
       // 더미 데이터
       dummyUsers: [
-        {
-          id: 1,
-          username: '동세영',
-          password: '1234',
-          name: '동세영',
-          role: 'student',
-          groupInfo: {
-            name: 'KT Azure Study',
-            role: 'admin',
-            inviteCode: 'ABC123'
-          }
-        },
-        {
-          id: 2,
-          username: '홍길동',
-          password: '1234',
-          name: '홍길동',
-          role: 'student',
-          groupInfo: {
-            name: 'KT Azure Study',
-            role: 'member',
-            inviteCode: 'ABC123'
-          }
-        },
-        {
-          id: 3,
-          username: '이소민',
-          password: '1234',
-          name: '이소민',
-          role: 'student',
-          groupInfo: null
-        }
+        { username: '동세영', password: '1234' },
+        { username: '홍길동', password: '1234' },
+        { username: '이소민', password: '1234' }
       ]
     }
   },
