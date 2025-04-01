@@ -157,6 +157,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'ProblemCreate',
   data() {
@@ -166,12 +168,7 @@ export default {
       uploadedFiles: [], // 업로드된 PDF 파일 목록
       isLeader: false, // 그룹장 여부
       problemSets: [], // 생성된 문제 세트 목록
-      subjects: [
-        { id: 1, name: 'KT Azure Cloud' },
-        { id: 2, name: 'KT AI' },
-        { id: 3, name: 'KT Network' },
-        { id: 4, name: 'KT Security' }
-      ],
+      subjects: [], // 과목 목록
       selectedSubject: null,
       showNewSubjectPopup: false,
       newSubjectName: ''
@@ -211,43 +208,101 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     },
-    uploadFile() {
+    async uploadFile() {
       if (!this.selectedFile) return;
       
-      // 파일을 uploadedFiles 배열에 추가
-      this.uploadedFiles.push({
-        name: this.selectedFile.name,
-        size: this.selectedFile.size,
-        selected: false
-      });
-      
-      // 임시로 성공 메시지 표시
-      alert('파일이 성공적으로 업로드되었습니다!');
-      this.selectedFile = null;
+      try {
+        // userInfo에서 groupId 가져오기
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          alert('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        // FormData 객체 생성
+        const formData = new FormData();
+        formData.append('file', this.selectedFile);
+        formData.append('groupId', groupId);
+
+        // 파일 업로드 API 호출
+        const response = await axios.post('/uploadfile', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.data.success) {
+          // 파일을 uploadedFiles 배열에 추가
+          this.uploadedFiles.push({
+            name: this.selectedFile.name,
+            size: this.selectedFile.size,
+            selected: false
+          });
+          
+          alert('파일이 성공적으로 업로드되었습니다!');
+          this.selectedFile = null;
+        } else {
+          alert('파일 업로드에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('파일 업로드 중 오류 발생:', error);
+        alert('파일 업로드 중 오류가 발생했습니다.');
+      }
     },
     selectSubject(subjectId) {
       this.selectedSubject = subjectId;
     },
-    addNewSubject() {
+    async addNewSubject() {
       if (!this.newSubjectName) {
         alert('문제 세트 이름을 입력해주세요');
         return;
       }
 
-      const newSubject = {
-        id: Date.now(),
-        name: this.newSubjectName
-      };
+      try {
+        // userInfo에서 groupId 가져오기
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          alert('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
 
-      this.subjects.push(newSubject);
-      this.showNewSubjectPopup = false;
-      this.newSubjectName = '';
+        // 백엔드로 보낼 데이터 준비
+        const requestData = {
+          groupId,
+          subjectName: this.newSubjectName
+        };
+
+        // API 호출
+        const response = await axios.post('/createNewsubject', requestData);
+
+        if (response.data.success) {
+          // 새 과목을 subjects 배열에 추가
+          const newSubject = {
+            id: response.data.subjectId, // 백엔드에서 생성된 ID 사용
+            name: this.newSubjectName
+          };
+
+          this.subjects.push(newSubject);
+          this.showNewSubjectPopup = false;
+          this.newSubjectName = '';
+          alert('새 문제 세트가 생성되었습니다!');
+        } else {
+          alert('문제 세트 생성에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('문제 세트 생성 중 오류 발생:', error);
+        alert('문제 세트 생성 중 오류가 발생했습니다.');
+      }
     },
     cancelNewSubject() {
       this.showNewSubjectPopup = false;
       this.newSubjectName = '';
     },
-    createProblem() {
+    async createProblem() {
       if (!this.selectedSubject) {
         alert('문제 세트를 선택해주세요.');
         return;
@@ -259,30 +314,45 @@ export default {
         return;
       }
 
-      const selectedSubject = this.subjects.find(s => s.id === this.selectedSubject);
+      try {
+        // userInfo에서 groupId 가져오기
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          alert('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
 
-      // 문제 생성 로직
-      const problem = {
-        name: selectedSubject.name,
-        subject: selectedSubject.name,
-        type: this.isLeader ? 'exam' : 'practice',
-        pdfFiles: selectedFiles,
-        createdAt: new Date().toLocaleString('ko-KR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      };
+        const selectedSubject = this.subjects.find(s => s.id === this.selectedSubject);
 
-      // 문제 세트 목록에 추가
-      this.problemSets.push(problem);
-      alert('문제가 생성되었습니다!');
-      
-      // 문제 생성 후 폼 초기화
-      this.selectedSubject = null;
-      this.uploadedFiles = [];
+        // 백엔드로 보낼 데이터 준비
+        const requestData = {
+          groupId,
+          subjectId: selectedSubject.id,
+          subjectName: selectedSubject.name,
+          isCreatedByLeader: this.isLeader,
+          attachmentNames: selectedFiles.map(file => file.name)
+        };
+
+        // API 호출
+        const response = await axios.post('/createQuiz', requestData);
+
+        if (response.data.success) {
+          // 문제 세트 목록 새로고침
+          await this.fetchProblemSets(groupId);
+          alert('문제가 생성되었습니다!');
+          
+          // 문제 생성 후 폼 초기화
+          this.selectedSubject = null;
+          this.uploadedFiles = [];
+        } else {
+          alert('문제 생성에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('문제 생성 중 오류 발생:', error);
+        alert('문제 생성 중 오류가 발생했습니다.');
+      }
     },
     viewProblemSet(set) {
       // 문제 세트 상세 보기 로직 구현
@@ -295,6 +365,51 @@ export default {
     },
     goBack() {
       this.$router.push('/studentmenu');
+    },
+    async fetchSubjects(groupId) {
+      try {
+        const response = await axios.get('/subjects', {
+          params: { groupId }
+        });
+
+        if (response.data.success) {
+          this.subjects = response.data.subjects.map(subject => ({
+            id: subject.id,
+            name: subject.name
+          }));
+        } else {
+          console.error('과목 목록을 가져오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('과목 목록을 가져오는 중 오류 발생:', error);
+      }
+    },
+    async fetchProblemSets(groupId) {
+      try {
+        const response = await axios.get('/quiz/sets', {
+          params: { groupId }
+        });
+
+        if (response.data.success) {
+          this.problemSets = response.data.quizSets.map(set => ({
+            name: set.subjectName,
+            subject: set.subjectName,
+            type: set.isCreatedByLeader ? 'exam' : 'practice',
+            pdfFiles: set.attachmentNames.map(name => ({ name })),
+            createdAt: new Date(set.createTime).toLocaleString('ko-KR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }));
+        } else {
+          console.error('문제 세트 목록을 가져오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('문제 세트 목록을 가져오는 중 오류 발생:', error);
+      }
     }
   },
   created() {
@@ -303,7 +418,46 @@ export default {
     if (userInfoStr) {
       const userInfo = JSON.parse(userInfoStr);
       this.isLeader = userInfo.groupInfo?.role === 'admin';
+      
+      // 그룹 ID 가져오기
+      const groupId = userInfo.groupInfo?.groupId;
+      if (groupId) {
+        // 해당 그룹의 과목 목록과 문제 세트 목록 가져오기
+        this.fetchSubjects(groupId);
+        this.fetchProblemSets(groupId);
+      }
     }
+
+    // TODO: 나중에 구현할 파일 목록 가져오기 기능
+    /*
+    async function fetchUploadedFiles() {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          console.error('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        const response = await axios.get('/files', {
+          params: { groupId }
+        });
+
+        if (response.data.success) {
+          this.uploadedFiles = response.data.files.map(file => ({
+            name: file.name,
+            size: file.size,
+            selected: false
+          }));
+        }
+      } catch (error) {
+        console.error('파일 목록을 가져오는 중 오류 발생:', error);
+      }
+    }
+
+    fetchUploadedFiles();
+    */
   }
 }
 </script>

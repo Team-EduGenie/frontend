@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'Exam',
   data() {
@@ -102,21 +104,43 @@ export default {
       isStarted: false,
       currentQuestionIndex: 0,
       selectedAnswer: null,
-      timeLeft: 3600, // 1시간
-      questions: [
-        {
-          question: '1 + 1 = ?',
-          options: ['2', '3', '4', '5']
-        },
-        {
-          question: '2 + 2 = ?',
-          options: ['3', '4', '5', '6']
-        },
-        {
-          question: '3 + 3 = ?',
-          options: ['5', '6', '7', '8']
-        }
-      ]
+      timeLeft: 360, // 6분
+      questions: [],
+      subjectId: null,
+      groupId: null,
+      timer: null,
+      userAnswers: [] // 사용자의 답을 저장하는 배열
+    }
+  },
+  async created() {
+    // URL에서 subjectId 가져오기
+    const subjectId = this.$route.query.subjectId;
+    // if (!subjectId) {
+    //   console.error('과목 ID가 없습니다.');
+    //   this.$router.push('/studentmenu');
+    //   return;
+    // }
+    this.subjectId = subjectId;
+
+    // userInfo에서 groupId 가져오기
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (!userInfo || !userInfo.groupInfo || !userInfo.groupInfo.groupId) {
+      console.error('그룹 정보를 찾을 수 없습니다.');
+      this.$router.push('/studentmenu');
+      return;
+    }
+
+    try {
+      // 해당 과목의 퀴즈 문제들 가져오기
+      const response = await axios.get(`/quizzes?subjectId=${this.subjectId}`);
+      this.questions = response.data.map(quiz => ({
+        question: quiz.question,
+        options: quiz.options,
+        answer: quiz.answer
+      }));
+    } catch (error) {
+      console.error('퀴즈 문제를 가져오는데 실패했습니다:', error);
+      // this.$router.push('/studentmenu');
     }
   },
   computed: {
@@ -131,8 +155,9 @@ export default {
   },
   methods: {
     startExam() {
-      this.isStarted = true
-      this.startTimer()
+      console.log('시험 시작 버튼이 클릭되었습니다.');
+      this.isStarted = true;
+      this.startTimer();
     },
     startTimer() {
       this.timer = setInterval(() => {
@@ -154,12 +179,44 @@ export default {
     },
     nextQuestion() {
       if (this.currentQuestionIndex < this.questions.length - 1) {
+        // 현재 문제의 답을 저장
+        if (this.selectedAnswer !== null) {
+          this.userAnswers.push({
+            quizId: this.questions[this.currentQuestionIndex].id,
+            userAnswer: this.selectedAnswer
+          });
+        }
         this.currentQuestionIndex++
         this.selectedAnswer = null
       }
     },
-    submitExam() {
-      this.$router.push('/exam-result');
+    async submitExam() {
+      // 마지막 문제의 답도 저장
+      if (this.selectedAnswer !== null) {
+        this.userAnswers.push({
+          quizId: this.questions[this.currentQuestionIndex].id,
+          userAnswer: this.selectedAnswer
+        });
+      }
+
+      try {
+        // 답안 제출
+        await axios.post('/quiz/submit', {
+          subjectId: this.subjectId,
+          answers: this.userAnswers
+        });
+
+        // 결과 페이지로 이동
+        this.$router.push({
+          path: '/exam-result',
+          query: {
+            subjectId: this.subjectId
+          }
+        });
+      } catch (error) {
+        console.error('답안 제출에 실패했습니다:', error);
+        alert('답안 제출에 실패했습니다. 다시 시도해주세요.');
+      }
     }
   },
   beforeDestroy() {

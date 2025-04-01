@@ -3,8 +3,18 @@
     <div class="result-container">
       <h1>시험 결과 📊</h1>
       
+      <!-- 에러 메시지 -->
+      <div v-if="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <!-- 로딩 상태 -->
+      <div v-if="loading" class="loading-message">
+        해설을 생성하는 중입니다...
+      </div>
+      
       <!-- 결과 테이블 -->
-      <div class="result-table-container">
+      <div v-if="problems.length > 0" class="result-table-container">
         <table class="result-table">
           <thead>
             <tr>
@@ -31,12 +41,15 @@
                   <span class="button-text">{{ problem.showExplanation ? '접기' : '펼쳐보기' }}</span>
                 </button>
                 <div v-if="problem.showExplanation" class="explanation-content">
-                  {{ problem.explanation }}
+                  {{ problem.explanation || '해설을 불러오는 중입니다...' }}
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-else class="no-results">
+        결과가 없습니다.
       </div>
 
       <!-- 메인 메뉴로 돌아가기 버튼 -->
@@ -46,49 +59,82 @@
           <span class="button-text">메인 메뉴로 돌아가기</span>
         </button>
       </div>
-
-      <!-- 챗봇 버튼 (비활성화) -->
-      <button class="chatbot-btn disabled" disabled>
-        <span class="chatbot-icon">🤖</span>
-        <span class="chatbot-text">챗봇</span>
-      </button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'ExamResult',
   data() {
     return {
-      problems: [
-        {
-          question: "1 + 1 = ?",
-          answer: "2",
-          isCorrect: true,
-          explanation: "1과 1을 더하면 2가 됩니다.",
-          showExplanation: false
-        },
-        {
-          question: "2 x 3 = ?",
-          answer: "5",
-          isCorrect: false,
-          explanation: "2와 3을 곱하면 6이 됩니다.",
-          showExplanation: false
-        },
-        {
-          question: "10 ÷ 2 = ?",
-          answer: "5",
-          isCorrect: true,
-          explanation: "10을 2로 나누면 5가 됩니다.",
-          showExplanation: false
+      problems: [],
+      loading: false,
+      error: null
+    }
+  },
+  async created() {
+    try {
+      // URL에서 subjectId와 groupId 가져오기
+      const subjectId = this.$route.query.subjectId;
+      const groupId = this.$route.query.groupId;
+      
+      if (!subjectId || !groupId) {
+        throw new Error('필수 파라미터가 누락되었습니다.');
+      }
+
+      // 퀴즈 결과 데이터 가져오기
+      const response = await axios.get(`/quiz/results`, {
+        params: {
+          subjectId,
+          groupId
         }
-      ]
+      });
+
+      // 데이터 형식 변환
+      this.problems = response.data.map(result => ({
+        question: result.question,
+        answer: result.answer,
+        options: result.options,
+        isCorrect: result.isCorrect,
+        explanation: null, // 초기에는 null로 설정
+        showExplanation: false
+      }));
+    } catch (error) {
+      console.error('퀴즈 결과를 가져오는데 실패했습니다:', error);
+      this.error = '퀴즈 결과를 불러오는데 실패했습니다.';
     }
   },
   methods: {
-    toggleExplanation(index) {
-      this.problems[index].showExplanation = !this.problems[index].showExplanation;
+    async toggleExplanation(index) {
+      const problem = this.problems[index];
+      
+      // 이미 해설이 있는 경우는 토글만 수행
+      if (problem.explanation) {
+        problem.showExplanation = !problem.showExplanation;
+        return;
+      }
+
+      // 해설이 없는 경우 OpenAI API 호출
+      try {
+        this.loading = true;
+        const response = await axios.post('/explanation', {
+          question: problem.question,
+          answer: problem.answer,
+          options: problem.options
+        });
+
+        problem.explanation = response.data.explanation;
+        problem.showExplanation = true;
+      } catch (error) {
+        console.error('해설을 가져오는데 실패했습니다:', error);
+        problem.explanation = '해설을 불러오는데 실패했습니다.';
+        problem.showExplanation = true;
+      } finally {
+        this.loading = false;
+      }
     },
     goToMainMenu() {
       this.$router.push('/studentmenu');
@@ -184,45 +230,6 @@ h1 {
   font-size: 1.1em;
 }
 
-.chatbot-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-.chatbot-btn:hover:not(.disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
-}
-
-.chatbot-btn.disabled {
-  background-color: #adb5bd;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.chatbot-icon {
-  font-size: 1.5em;
-  margin-bottom: 2px;
-}
-
-.chatbot-text {
-  font-size: 0.8em;
-}
-
 @media (max-width: 768px) {
   .exam-result-view {
     padding: 10px;
@@ -232,21 +239,6 @@ h1 {
   .result-table td {
     padding: 10px;
     font-size: 0.9em;
-  }
-
-  .chatbot-btn {
-    width: 50px;
-    height: 50px;
-    bottom: 20px;
-    right: 20px;
-  }
-
-  .chatbot-icon {
-    font-size: 1.3em;
-  }
-
-  .chatbot-text {
-    font-size: 0.7em;
   }
 
   .back-button {
@@ -305,6 +297,31 @@ h1 {
 }
 
 .back-button .button-icon {
+  font-size: 1.2em;
+}
+
+.error-message {
+  background-color: #ffe3e3;
+  color: #ff6b6b;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.loading-message {
+  background-color: #e3fcef;
+  color: #00b894;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
   font-size: 1.2em;
 }
 </style> 

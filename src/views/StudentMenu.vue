@@ -91,7 +91,7 @@
                   </div>
                 </div>
               </div>
-              <button @click="startProblem(subject)" class="solve-button">
+              <button @click="startExam(subject)" class="solve-button">
                 <span class="button-icon">✏️</span>
                 <span class="button-text">풀기</span>
               </button>
@@ -112,7 +112,7 @@
                   </div>
                 </div>
               </div>
-              <button @click="startProblem(subject)" class="solve-button">
+              <button @click="startExam(subject)" class="solve-button">
                 <span class="button-icon">✏️</span>
                 <span class="button-text">풀기</span>
               </button>
@@ -193,10 +193,9 @@ export default {
         day: 'numeric'
       });
     },
-    startProblem(subject) {
-      // 문제 풀기 페이지로 이동
+    startExam(subject) {
       this.$router.push({
-        path: '/problem-solve',
+        path: '/exam',
         query: {
           subjectId: subject.id
         }

@@ -2,18 +2,40 @@
   <div class="manager-dashboard">
     <h1>그룹 학습 현황 📊</h1>
     <div class="dashboard-container">
+      <!-- 과목 선택 섹션 추가 -->
+      <div class="subject-selector">
+        <h2>과목 선택</h2>
+        <div class="subject-list">
+          <div 
+            v-for="subject in subjects" 
+            :key="subject.id"
+            :class="['subject-item', { active: selectedSubject === subject.id }]"
+            @click="selectSubject(subject.id)"
+          >
+            <span class="subject-icon">📝</span>
+            <span class="subject-name">{{ subject.name }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="leaderboard">
         <h2>리더보드</h2>
+        <div v-if="selectedSubject" class="subject-info">
+          <span class="selected-subject">{{ getSelectedSubjectName }}</span>
+        </div>
         <div class="leaderboard-list">
-          <div v-for="(user, index) in sortedUsers" :key="user.id" class="leaderboard-item">
+          <div v-for="(user, index) in sortedUsers" :key="user.userId" class="leaderboard-item">
             <div class="rank">{{ index + 1 }}</div>
             <div class="user-info">
-              <span class="user-name">{{ user.name }}</span>
+              <span class="user-name">{{ user.userName }}</span>
               <div class="score-info">
                 <span class="score">{{ user.score }}점</span>
-                <span class="quiz-count">{{ user.quizCount }}문제 완료</span>
+                <span class="time">{{ formatTime(user.time) }}</span>
               </div>
             </div>
+          </div>
+          <div v-if="sortedUsers.length === 0" class="no-data">
+            아직 퀴즈를 푼 학생이 없습니다.
           </div>
         </div>
       </div>
@@ -29,28 +51,94 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'ManagerDashboard',
   data() {
     return {
-      users: [
-        { id: 1, name: "김학생", score: 95, quizCount: 20 },
-        { id: 2, name: "이학생", score: 88, quizCount: 18 },
-        { id: 3, name: "박학생", score: 85, quizCount: 15 },
-        { id: 4, name: "최학생", score: 82, quizCount: 17 },
-        { id: 5, name: "정학생", score: 78, quizCount: 14 }
-      ]
+      subjects: [],
+      selectedSubject: null,
+      users: []
     }
   },
   computed: {
     sortedUsers() {
       return [...this.users].sort((a, b) => b.score - a.score);
+    },
+    getSelectedSubjectName() {
+      const subject = this.subjects.find(s => s.id === this.selectedSubject);
+      return subject ? subject.name : '';
     }
   },
   methods: {
+    async fetchSubjects() {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          console.error('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        const response = await axios.get('/subjects', {
+          params: { groupId }
+        });
+
+        if (response.data.success) {
+          this.subjects = response.data.subjects;
+          if (this.subjects.length > 0) {
+            this.selectSubject(this.subjects[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('과목 목록을 가져오는데 실패했습니다:', error);
+      }
+    },
+
+    async selectSubject(subjectId) {
+      this.selectedSubject = subjectId;
+      await this.fetchLeaderboard(subjectId);
+    },
+
+    async fetchLeaderboard(subjectId) {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          console.error('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        const response = await axios.get('/leaderboard', {
+          params: {
+            groupId,
+            subjectId
+          }
+        });
+
+        if (response.data.success) {
+          this.users = response.data.rankings;
+        }
+      } catch (error) {
+        console.error('리더보드 데이터를 가져오는데 실패했습니다:', error);
+      }
+    },
+
+    formatTime(time) {
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      return `${minutes}분 ${seconds}초`;
+    },
+
     goBack() {
       this.$router.push('/studentmenu');
     }
+  },
+  async created() {
+    await this.fetchSubjects();
   }
 }
 </script>
@@ -72,6 +160,81 @@ h1 {
 .dashboard-container {
   display: flex;
   gap: 30px;
+}
+
+.subject-selector {
+  width: 300px;
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.subject-selector h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.subject-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.subject-item:hover {
+  background: #fff5f5;
+  transform: translateY(-2px);
+}
+
+.subject-item.active {
+  background: #ff6b6b;
+  color: white;
+}
+
+.subject-icon {
+  font-size: 1.2em;
+}
+
+.subject-name {
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.subject-info {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #fff5f5;
+  border-radius: 8px;
+}
+
+.selected-subject {
+  color: #ff6b6b;
+  font-weight: 500;
+  font-size: 1.1em;
+}
+
+.time {
+  color: #5c6b7a;
+  font-size: 0.9em;
+}
+
+.no-data {
+  text-align: center;
+  color: #5c6b7a;
+  padding: 40px;
+  font-size: 1.1em;
 }
 
 .leaderboard {
@@ -146,11 +309,6 @@ h1 {
   font-size: 1.1em;
 }
 
-.quiz-count {
-  color: #5c6b7a;
-  font-size: 0.9em;
-}
-
 @media (max-width: 768px) {
   .manager-dashboard {
     padding: 20px;
@@ -182,14 +340,18 @@ h1 {
     font-size: 1em;
   }
 
-  .quiz-count {
-    font-size: 0.8em;
-  }
-
   .back-button {
     width: 100%;
     max-width: 300px;
     justify-content: center;
+  }
+
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .subject-selector {
+    width: 100%;
   }
 }
 

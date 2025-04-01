@@ -36,8 +36,9 @@
                       <span class="wrong-answer">내가 선택한 답: {{ quiz.userAnswer }}</span>
                       <span class="correct-answer">정답: {{ quiz.correctAnswer }}</span>
                     </div>
-                    <button class="review-button" @click="reviewQuiz(quiz.id)">
-                      다시 풀어보기
+                    <button class="review-button disabled" disabled>
+                      <span class="button-icon">🤖</span>
+                      <span class="button-text">AI 해설 보기</span>
                     </button>
                   </div>
                 </div>
@@ -70,6 +71,7 @@
 
 <script>
 import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, BarController } from 'chart.js'
+import axios from 'axios'
 
 Chart.register(
   CategoryScale,
@@ -86,57 +88,112 @@ export default {
   data() {
     return {
       selectedSet: null,
-      problemSets: [
-        { id: 1, name: "KT Azure Cloud 자격증", score: 85 },
-        { id: 2, name: "KT AI 역량 인증", score: 92 },
-        { id: 3, name: "KT Cloud MSA", score: 78 },
-        { id: 4, name: "KT DevOps 인증", score: 88 }
-      ],
-      wrongQuizzes: [
-        {
-          id: 1,
-          number: 1,
-          question: "Azure Virtual Machine의 가용성 집합(Availability Set)에서 장애 도메인(Fault Domain)의 최대 개수는?",
-          userAnswer: "5개",
-          correctAnswer: "3개",
-          date: "2024-03-15"
-        },
-        {
-          id: 2,
-          number: 2,
-          question: "Azure Kubernetes Service(AKS)에서 노드 풀(Node Pool)을 스케일링하는 가장 효율적인 방법은?",
-          userAnswer: "수동으로 노드 수 조정",
-          correctAnswer: "Cluster Autoscaler 사용",
-          date: "2024-03-15"
-        },
-        {
-          id: 3,
-          number: 3,
-          question: "Azure에서 컨테이너 레지스트리(Container Registry)의 이미지 태그가 변경되지 않도록 보호하는 기능은?",
-          userAnswer: "Image Lock",
-          correctAnswer: "Tag Lock",
-          date: "2024-03-14"
-        }
-      ],
+      problemSets: [],
+      wrongQuizzes: [],
       chart: null
     }
   },
   methods: {
-    selectSet(setId) {
+    async fetchSubjects() {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const groupId = userInfo?.groupInfo?.groupId;
+        
+        if (!groupId) {
+          console.error('그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        // 과목 목록 가져오기
+        const response = await axios.get('/subjects', {
+          params: { groupId }
+        });
+
+        if (response.data.success) {
+          this.problemSets = response.data.subjects.map(subject => ({
+            id: subject.id,
+            name: subject.name
+          }));
+
+          // 각 과목의 점수 정보 가져오기
+          const scoresResponse = await axios.get('/leaderboard', {
+            params: { groupId }
+          });
+
+          if (scoresResponse.data.success) {
+            // 각 과목별 점수 정보를 problemSets에 추가
+            this.problemSets = this.problemSets.map(set => ({
+              ...set,
+              score: scoresResponse.data.scores[set.id] || 0
+            }));
+
+            // 차트 초기화
+            this.$nextTick(() => {
+              this.initChart();
+            });
+          }
+        }
+      } catch (error) {
+        console.error('과목 목록을 가져오는데 실패했습니다:', error);
+      }
+    },
+
+    async fetchWrongQuizzes(subjectId) {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const userId = userInfo?.userId;
+        
+        if (!userId) {
+          console.error('사용자 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        // 틀린 문제 목록 가져오기
+        const response = await axios.get('/quiz-user/wrong', {
+          params: {
+            subjectId,
+            userId
+          }
+        });
+
+        if (response.data.success) {
+          this.wrongQuizzes = response.data.wrongQuizzes.map(quiz => ({
+            id: quiz.quizId,
+            number: quiz.number,
+            question: quiz.question,
+            userAnswer: quiz.userAnswer,
+            correctAnswer: quiz.correctAnswer,
+            date: new Date(quiz.createTime).toLocaleDateString('ko-KR')
+          }));
+        }
+      } catch (error) {
+        console.error('틀린 문제 목록을 가져오는데 실패했습니다:', error);
+      }
+    },
+
+    async selectSet(setId) {
       if (this.selectedSet === setId) {
         this.selectedSet = null;
+        this.wrongQuizzes = [];
         this.$nextTick(() => {
           this.initChart();
         });
       } else {
         this.selectedSet = setId;
-        // TODO: API 호출하여 해당 문제 세트의 틀린 문제 목록 가져오기
+        await this.fetchWrongQuizzes(setId);
       }
     },
+
     reviewQuiz(quizId) {
-      // TODO: 문제 다시 풀기 페이지로 이동
-      console.log('Review quiz:', quizId);
+      this.$router.push({
+        path: '/exam',
+        query: {
+          subjectId: this.selectedSet,
+          quizId: quizId
+        }
+      });
     },
+
     initChart() {
       if (this.chart) {
         this.chart.destroy();
@@ -188,10 +245,8 @@ export default {
       this.$router.push('/studentmenu');
     }
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.initChart();
-    });
+  async created() {
+    await this.fetchSubjects();
   },
   beforeDestroy() {
     if (this.chart) {
@@ -357,11 +412,24 @@ h1 {
   padding: 8px 16px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.review-button:hover {
+.review-button:hover:not(.disabled) {
   background: #ff5252;
   transform: translateY(-2px);
+}
+
+.review-button.disabled {
+  background: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.button-icon {
+  font-size: 1.1em;
 }
 
 .no-quizzes, .no-subject {
