@@ -14,6 +14,10 @@
           class="group-input"
         >
       </div>
+      <p v-if="errorMessage" class="error-message">
+        <span class="error-icon">😅</span>
+        {{ errorMessage }}
+      </p>
       <button @click="createGroup" class="create-button">
         <span class="button-text">그룹 만들기</span>
         <span class="button-icon">✨</span>
@@ -53,39 +57,60 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'GroupCreate',
   data() {
     return {
       groupName: '',
-      currentGroup: null
+      currentGroup: null,
+      errorMessage: ''
     }
   },
   methods: {
-    createGroup() {
+    async createGroup() {
       if (!this.groupName.trim()) {
-        alert('그룹 이름을 입력해주세요!');
+        this.errorMessage = '그룹 이름을 입력해주세요!';
         return;
       }
       
       if (this.currentGroup) {
-        alert('무료 버전에서는 그룹을 1개만 만들 수 있습니다.');
+        this.errorMessage = '무료 버전에서는 그룹을 1개만 만들 수 있습니다.';
         return;
       }
       
-      // 더미 데이터로 그룹 생성
-      this.currentGroup = {
-        name: 'KT Azure Study',
-        inviteCode: 'ABC123'
-      };
-      
-      alert('그룹이 성공적으로 생성되었습니다!');
+      try {
+        const response = await axios.post('/groups', {
+          groupName: this.groupName
+        });
+
+        if (response.data) {
+          this.currentGroup = {
+            name: this.groupName,
+            inviteCode: response.data.inviteCode
+          };
+          this.errorMessage = '';
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          this.errorMessage = error.response.data.message || '그룹 생성에 실패했습니다.';
+        } else {
+          this.errorMessage = '서버 오류가 발생했습니다.';
+        }
+      }
     },
-    deleteGroup() {
+    //future work : 그룹 삭제는 나중에 추가
+    async deleteGroup() {
       if (confirm('정말로 그룹을 삭제하시겠습니까?')) {
-        this.currentGroup = null;
-        this.groupName = '';
-        alert('그룹이 삭제되었습니다.');
+        try {
+          await axios.delete(`/group/${this.currentGroup.inviteCode}`);
+          this.currentGroup = null;
+          this.groupName = '';
+          this.errorMessage = '';
+        } catch (error) {
+          this.errorMessage = '그룹 삭제에 실패했습니다.';
+        }
       }
     },
     goBack() {
@@ -346,6 +371,24 @@ h1 {
 
 .back-button .button-text {
   font-weight: 500;
+}
+
+.error-message {
+  color: #ff6b6b;
+  text-align: center;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: rgba(255,107,107,0.1);
+  padding: 15px;
+  border-radius: 15px;
+  width: 100%;
+}
+
+.error-icon {
+  font-size: 1.3em;
 }
 
 @media (max-width: 768px) {

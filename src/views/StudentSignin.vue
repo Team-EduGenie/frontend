@@ -9,7 +9,7 @@
         <span class="input-icon">👤</span>
         <input 
           type="text" 
-          v-model="studentName" 
+          v-model="userName" 
           placeholder="이름을 입력해주세요" 
           class="signin-input"
         >
@@ -18,17 +18,8 @@
         <span class="input-icon">🆔</span>
         <input 
           type="text" 
-          v-model="studentId" 
+          v-model="userId" 
           placeholder="아이디를 입력해주세요" 
-          class="signin-input"
-        >
-      </div>
-      <div class="input-wrapper">
-        <span class="input-icon">🎂</span>
-        <input 
-          type="number" 
-          v-model="age" 
-          placeholder="나이를 입력해주세요" 
           class="signin-input"
         >
       </div>
@@ -82,9 +73,8 @@ export default {
   name: 'StudentSignin',
   data() {
     return {
-      studentName: '',
-      studentId: '',
-      age: '',
+      userName: '',
+      userId: '',
       password: '',
       confirmPassword: '',
       errorMessage: ''
@@ -93,7 +83,7 @@ export default {
   methods: {
     async handleSignin() {
       // 입력값 검증
-      if (!this.studentName.trim() || !this.studentId.trim() || !this.age || !this.password || !this.confirmPassword) {
+      if (!this.userName.trim() || !this.userId.trim() || !this.password || !this.confirmPassword) {
         this.errorMessage = '모든 항목을 입력해주세요.';
         return;
       }
@@ -109,10 +99,9 @@ export default {
       }
 
       try {
-        const response = await axiosInst.post('/students/signup', {
-          student_name: this.studentName,
-          student_id: this.studentId,
-          age: parseInt(this.age),
+        const response = await axiosInst.post('/users', {
+          username: this.username,
+          userId: this.userId,
           password: this.password
         });
 

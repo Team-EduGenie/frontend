@@ -6,7 +6,7 @@
       <div v-if="userInfo && userInfo.groupInfo" class="group-info">
         <span class="user-name">{{ userInfo.name }}</span>
         <span class="group-badge">{{ userInfo.groupInfo.name }}</span>
-        <span class="role-badge">{{ userInfo.groupInfo.role === 'admin' ? '관리자' : '그룹원' }}</span>
+        <span class="role-badge">{{ userInfo.groupInfo.isGroupLeader ? '관리자' : '그룹원' }}</span>
       </div>
     </div>
     <div class="menu-buttons">
@@ -18,10 +18,10 @@
         </div>
       </div>
       <div class="menu-item" @click="goToExam">
-        <div class="menu-icon">✍️</div>
+        <div class="menu-icon">📝</div>
         <div class="menu-text">
           <h3>문제 풀기</h3>
-          <p>연습과 실전 문제를 풀어봐요!</p>
+          <p>선택한 과목의 문제를 풀어보세요!</p>
         </div>
       </div>
       <div class="menu-item" @click="goToStudyStatus">
@@ -60,15 +60,15 @@
         <!-- 문제 유형 선택 -->
         <div class="problem-type-selector">
           <button 
-            :class="['type-btn', { active: selectedType === 'practice' }]" 
-            @click="selectedType = 'practice'"
+            :class="['type-btn', { active: activeTab === 'practice' }]" 
+            @click="activeTab = 'practice'"
           >
             <span class="type-icon">📚</span>
             <span class="type-text">연습문제</span>
           </button>
           <button 
-            :class="['type-btn', { active: selectedType === 'exam' }]" 
-            @click="selectedType = 'exam'"
+            :class="['type-btn', { active: activeTab === 'exam' }]" 
+            @click="activeTab = 'exam'"
           >
             <span class="type-icon">✍️</span>
             <span class="type-text">시험문제</span>
@@ -76,26 +76,47 @@
         </div>
 
         <div class="problem-sets-list">
-          <div v-for="(set, index) in filteredProblemSets" :key="index" class="problem-set-item">
-            <div class="set-info">
-              <span class="set-icon">{{ set.isExam ? '✍️' : '📚' }}</span>
-              <div class="set-details">
-                <span class="set-name">{{ set.name }}</span>
-                <span class="set-date">{{ set.createdAt }}</span>
-                <div class="set-pdfs">
-                  <span class="pdf-label">사용된 PDF:</span>
-                  <div class="pdf-list">
-                    <span v-for="(pdf, pdfIndex) in set.pdfFiles" :key="pdfIndex" class="pdf-tag">
-                      {{ pdf.name }}
-                    </span>
+          <div v-if="activeTab === 'practice'" class="practice-problems">
+            <div v-for="subject in practiceSubjects" :key="subject.id" class="problem-set-item">
+              <div class="set-info">
+                <span class="set-icon">📚</span>
+                <div class="set-details">
+                  <span class="set-name">{{ subject.subjectName }}</span>
+                  <span class="set-date">{{ formatDate(subject.createTime) }}</span>
+                  <div class="set-pdfs">
+                    <span class="pdf-label">사용된 PDF:</span>
+                    <div class="pdf-list">
+                      <span class="pdf-tag">{{ subject.attachmentNames }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
+              <button @click="startProblem(subject)" class="solve-button">
+                <span class="button-icon">✏️</span>
+                <span class="button-text">풀기</span>
+              </button>
             </div>
-            <button class="solve-button" @click="solveProblem(set)">
-              <span class="button-icon">✏️</span>
-              <span class="button-text">풀기</span>
-            </button>
+          </div>
+          <div v-else class="exam-problems">
+            <div v-for="subject in examSubjects" :key="subject.id" class="problem-set-item">
+              <div class="set-info">
+                <span class="set-icon">✍️</span>
+                <div class="set-details">
+                  <span class="set-name">{{ subject.subjectName }}</span>
+                  <span class="set-date">{{ formatDate(subject.createTime) }}</span>
+                  <div class="set-pdfs">
+                    <span class="pdf-label">사용된 PDF:</span>
+                    <div class="pdf-list">
+                      <span class="pdf-tag">{{ subject.attachmentNames }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button @click="startProblem(subject)" class="solve-button">
+                <span class="button-icon">✏️</span>
+                <span class="button-text">풀기</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -104,7 +125,7 @@
 </template>
 
 <script>
-import axiosInst from '../axios'
+import axios from 'axios'
 
 export default {
   name: 'StudentMenu',
@@ -113,49 +134,9 @@ export default {
       subjects: [],
       userInfo: null,
       showProblemPopup: false,
-      selectedType: 'practice', // 'practice' 또는 'exam'
-      problemSets: [
-        {
-          name: "수학 기초 연습",
-          createdAt: "2024년 3월 15일 14:30",
-          isExam: false,
-          pdfFiles: [
-            { name: "수학_기초.pdf", size: 1024000 },
-            { name: "수학_연습.pdf", size: 2048000 }
-          ]
-        },
-        {
-          name: "영어 문법 연습",
-          createdAt: "2024년 3월 14일 16:45",
-          isExam: false,
-          pdfFiles: [
-            { name: "영어_문법.pdf", size: 1536000 }
-          ]
-        },
-        {
-          name: "중간고사 수학",
-          createdAt: "2024년 3월 16일 09:00",
-          isExam: true,
-          pdfFiles: [
-            { name: "수학_중간고사.pdf", size: 3072000 }
-          ]
-        },
-        {
-          name: "영어 시험",
-          createdAt: "2024년 3월 17일 10:30",
-          isExam: true,
-          pdfFiles: [
-            { name: "영어_시험.pdf", size: 2048000 }
-          ]
-        }
-      ]
-    }
-  },
-  computed: {
-    filteredProblemSets() {
-      return this.problemSets.filter(set => 
-        this.selectedType === 'practice' ? !set.isExam : set.isExam
-      );
+      activeTab: 'practice',
+      practiceSubjects: [],
+      examSubjects: [],
     }
   },
   methods: {
@@ -164,10 +145,12 @@ export default {
     },
     goToExam() {
       this.showProblemPopup = true;
+      this.fetchSubjects();
     },
+    //수정필요 : 관리자와 그룹원 정보를 받아와야 가능
     goToStudyStatus() {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      if (userInfo && userInfo.groupInfo && userInfo.groupInfo.role === 'admin') {
+      if (userInfo && userInfo.groupInfo && userInfo.groupInfo.isGroupLeader) {
         this.$router.push('/managerdashboard');
       } else {
         this.$router.push('/student-dashboard');
@@ -179,20 +162,48 @@ export default {
     },
     closeProblemPopup() {
       this.showProblemPopup = false;
+      this.activeTab = 'practice';
+      this.practiceSubjects = [];
+      this.examSubjects = [];
     },
-    solveProblem(set) {
+    // 문제목록 불러오기
+    async fetchSubjects() {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (!userInfo || !userInfo.groupInfo || !userInfo.groupInfo.groupId) {
+          console.error('사용자 그룹 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        const response = await axios.get(`/subjects?groupId=${userInfo.groupInfo.groupId}`);
+        const subjects = response.data;
+        
+        // isCreatedByLeader 값에 따라 연습문제와 시험문제 분리
+        this.practiceSubjects = subjects.filter(subject => !subject.isCreatedByLeader);
+        this.examSubjects = subjects.filter(subject => subject.isCreatedByLeader);
+      } catch (error) {
+        console.error('문제 목록을 불러오는데 실패했습니다:', error);
+      }
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    },
+    startProblem(subject) {
       // 문제 풀기 페이지로 이동
-      this.$router.push('/exam');
+      this.$router.push({
+        path: '/problem-solve',
+        query: {
+          subjectId: subject.id
+        }
+      });
     }
   },
   async created() {
-    try {
-      const response = await axiosInst.get('/subjects');
-      this.subjects = response.data;
-    } catch (error) {
-      console.error('과목 목록을 가져오는데 실패했습니다:', error);
-    }
-
     // 로컬 스토리지에서 사용자 정보 가져오기
     const userInfoStr = localStorage.getItem('userInfo');
     if (userInfoStr) {
@@ -678,5 +689,82 @@ h1 {
     width: 100%;
     justify-content: center;
   }
+}
+
+.problem-list {
+  margin: 20px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.problem-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff5f5;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(255,107,107,0.2);
+}
+
+.problem-info {
+  flex: 1;
+}
+
+.problem-info h3 {
+  color: #495057;
+  font-size: 1.3em;
+  margin-bottom: 5px;
+}
+
+.problem-info .date {
+  color: #ff8787;
+  font-size: 0.9em;
+}
+
+.problem-info .pdf-name {
+  color: #adb5bd;
+  font-size: 0.9em;
+}
+
+.start-button {
+  padding: 10px 20px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.start-button:hover {
+  background-color: #ff5252;
+  transform: translateY(-2px);
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  background-color: #ff8787;
+  color: white;
 }
 </style>

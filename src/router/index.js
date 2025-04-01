@@ -2,17 +2,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import StudentLogin from '../views/StudentLogin.vue'
 import StudentSignin from '../views/StudentSignin.vue'
-import StudentManage from '../views/StudentManage.vue'
 import StudentMenu from '../views/StudentMenu.vue'
 import StudentDashboard from '../views/StudentDashboard.vue'
 import GroupCreate from '../views/GroupCreate.vue'
-import GroupManage from '@/views/GroupManage.vue'
 import Exam from '@/views/Exam.vue'
 import ProblemCreate from '@/views/ProblemCreate.vue'
 import GroupMenu from '../views/GroupMenu.vue'
 import GroupParticipate from '../views/GroupParticipate.vue'
 import ExamResult from '../views/ExamResult.vue'
 import ManagerDashboard from '../views/ManagerDashboard.vue'
+import GroupChoice from '../views/GroupChoice.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,11 +32,6 @@ const router = createRouter({
       component: StudentSignin
     },
     {
-      path: '/students',
-      name: 'students',
-      component: StudentManage
-    },
-    {
       path: '/studentmenu',
       name: 'studentmenu',
       component: StudentMenu
@@ -51,11 +45,6 @@ const router = createRouter({
       path: '/group',
       name: 'group',
       component: GroupCreate
-    },
-    {
-      path: '/group-manage',
-      name: 'group-manage',
-      component: GroupManage
     },
     {
       path: '/exam',
@@ -86,6 +75,11 @@ const router = createRouter({
       path: '/managerdashboard',
       name: 'ManagerDashboard',
       component: ManagerDashboard
+    },
+    {
+      path: '/group-choice',
+      name: 'group-choice',
+      component: GroupChoice
     }
   ]
 })

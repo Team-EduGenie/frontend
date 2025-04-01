@@ -16,6 +16,11 @@
           <h2>그룹 참가</h2>
           <p>기존 그룹에 참가해보세요!</p>
         </div>
+        <div class="menu-item group-choice" @click="goToGroupChoice">
+          <div class="menu-icon">👥</div>
+          <h2>그룹 선택</h2>
+          <p>학습할 그룹을 선택해보세요!</p>
+        </div>
       </div>
     </div>
     <div class="bottom-button">
@@ -46,6 +51,9 @@ export default {
     },
     goBack() {
       this.$router.push('/studentlogin');
+    },
+    goToGroupChoice() {
+      this.$router.push('/group-choice');
     }
   }
 }
@@ -102,9 +110,11 @@ h1 {
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 30px;
   padding: 20px;
+  width: 100%;
+  max-width: 1200px;
 }
 
 .menu-item {
@@ -119,6 +129,8 @@ h1 {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  height: 100%;
+  min-width: 250px;
 }
 
 .menu-item:hover {
@@ -145,11 +157,7 @@ h1 {
   margin: 0;
 }
 
-.create-group {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
-}
-
-.join-group {
+.create-group, .join-group, .group-choice {
   background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
 }
 

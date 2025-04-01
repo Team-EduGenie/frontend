@@ -2,43 +2,70 @@
   <div class="group-participate-view">
     <div class="header">
       <h1>그룹 참가 👥</h1>
-      <p class="subtitle">초대 코드를 입력하여 그룹에 참가해보세요!</p>
+      <p class="subtitle">참가하고 싶은 그룹을 검색해보세요!</p>
     </div>
     <div class="input-section">
       <div class="input-wrapper">
-        <span class="input-icon">🔑</span>
+        <span class="input-icon">🔍</span>
         <input 
           type="text" 
-          v-model="inviteCode" 
-          placeholder="초대 코드를 입력해주세요" 
+          v-model="searchQuery" 
+          placeholder="그룹 이름을 입력해주세요" 
           class="code-input"
         >
       </div>
-      <button @click="checkGroup" class="check-button">
-        <span class="button-text">확인</span>
+      <button @click="searchGroups" class="check-button">
+        <span class="button-text">검색</span>
         <span class="button-icon">🔍</span>
       </button>
     </div>
-    <div v-if="groupInfo" class="group-info">
-      <div class="info-card">
-        <h2>그룹 정보</h2>
-        <div class="info-item">
-          <span class="info-label">그룹 이름:</span>
-          <span class="info-value">{{ groupInfo.name }}</span>
+
+    <div v-if="groups && groups.length > 0" class="groups-list">
+      <div v-for="group in groups" :key="group.groupId" class="group-item">
+        <div class="group-info">
+          <span class="group-name">{{ group.groupName }}</span>
         </div>
-        <div class="info-item">
-          <span class="info-label">초대 코드:</span>
-          <span class="info-value">{{ groupInfo.inviteCode }}</span>
-        </div>
-        <button @click="joinGroup" class="join-button">
+        <button @click="showInvitePopup(group)" class="join-button">
           <span class="button-text">참가하기</span>
           <span class="button-icon">✨</span>
         </button>
       </div>
     </div>
-    <div v-if="errorMessage" class="error-message">
+
+    <div v-else-if="searchQuery" class="no-results">
+      <span class="error-icon">😅</span>
+      검색 결과가 없습니다.
+    </div>
+
+    <div v-if="errorMessage && !searchQuery" class="error-message">
+      <span class="error-icon">😅</span>
       {{ errorMessage }}
     </div>
+
+    <!-- 초대 코드 입력 팝업 -->
+    <div v-if="showPopup" class="popup-overlay">
+      <div class="popup-content">
+        <h2>초대 코드 입력</h2>
+        <div class="input-wrapper">
+          <span class="input-icon">🔑</span>
+          <input 
+            type="text" 
+            v-model="inviteCode" 
+            placeholder="초대 코드를 입력해주세요" 
+            class="code-input"
+          >
+        </div>
+        <div class="popup-buttons">
+          <button @click="closePopup" class="cancel-button">
+            <span class="button-text">취소</span>
+          </button>
+          <button @click="joinGroup" class="confirm-button">
+            <span class="button-text">확인</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="bottom-button">
       <button @click="goBack" class="back-button">
         <span class="button-icon">⬅️</span>
@@ -56,39 +83,77 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'GroupParticipate',
   data() {
     return {
+      searchQuery: '',
+      groups: [],
+      errorMessage: '',
+      showPopup: false,
       inviteCode: '',
-      groupInfo: null,
-      errorMessage: ''
+      selectedGroup: null,
+      currentGroup: null
     }
   },
   methods: {
-    checkGroup() {
-      if (!this.inviteCode.trim()) {
-        this.errorMessage = '초대 코드를 입력해주세요!';
-        this.groupInfo = null;
+    async searchGroups() {
+      if (!this.searchQuery.trim()) {
+        this.errorMessage = '그룹 이름을 입력해주세요!';
+        this.groups = [];
         return;
       }
 
-      // 더미 데이터로 그룹 확인
-      if (this.inviteCode === 'ABC123') {
-        this.groupInfo = {
-          name: 'KT Azure Study',
-          inviteCode: 'ABC123'
-        };
-        this.errorMessage = '';
-      } else {
-        this.errorMessage = '존재하지 않는 그룹입니다!';
-        this.groupInfo = null;
+      this.groups = []; // 검색 시작할 때 groups 배열 초기화
+      this.errorMessage = '';
+
+      try {
+        const response = await axios.get(`/groups/?groupName=${this.searchQuery}`);
+        if (response.data && Array.isArray(response.data)) {
+          this.groups = response.data;
+        } else {
+          this.groups = [];
+          this.errorMessage = '검색 결과가 없습니다.';
+        }
+      } catch (error) {
+        this.errorMessage = '그룹 검색에 실패했습니다.';
+        this.groups = [];
       }
     },
-    joinGroup() {
-      if (this.groupInfo) {
-        alert('홍길동님이 그룹에 참가했습니다!');
-        this.$router.push('/group-menu');
+    showInvitePopup(group) {
+      this.selectedGroup = group;
+      this.showPopup = true;
+      this.inviteCode = '';
+    },
+    closePopup() {
+      this.showPopup = false;
+      this.inviteCode = '';
+      this.selectedGroup = null;
+    },
+    async joinGroup() {
+      if (!this.inviteCode.trim()) {
+        this.errorMessage = '초대 코드를 입력해주세요!';
+        return;
+      }
+
+      try {
+        const response = await axios.post(`/groups/${this.selectedGroup.groupId}/members`, {
+          inviteCode: this.inviteCode
+        });
+
+        if (response.data) {
+          this.currentGroup = this.selectedGroup;
+          this.closePopup();
+          this.errorMessage = '';
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          this.errorMessage = '초대 코드가 일치하지 않습니다.';
+        } else {
+          this.errorMessage = '그룹 참가에 실패했습니다.';
+        }
       }
     },
     goBack() {
@@ -420,5 +485,120 @@ h1 {
     font-size: 1.2em;
     padding: 12px 25px;
   }
+}
+
+.groups-list {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(255,107,107,0.2);
+}
+
+.group-name {
+  font-size: 1.3em;
+  color: #495057;
+  font-weight: 500;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.popup-content h2 {
+  color: #ff6b6b;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.cancel-button, .confirm-button {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-button {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.confirm-button {
+  background-color: #ff8787;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #e9ecef;
+}
+
+.confirm-button:hover {
+  background-color: #ff6b6b;
+}
+
+@media (max-width: 768px) {
+  .group-item {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .popup-content {
+    padding: 20px;
+    width: 95%;
+  }
+
+  .popup-content h2 {
+    font-size: 1.5em;
+  }
+}
+
+.no-results {
+  color: #ff8787;
+  font-size: 1.2em;
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+  z-index: 1;
 }
 </style> 
