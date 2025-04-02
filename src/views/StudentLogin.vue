@@ -67,7 +67,7 @@ export default {
           // 사용자 정보를 localStorage에 저장
           localStorage.setItem('userInfo', JSON.stringify(response.data));
           // 로그인 성공 시 studentmenu로 이동
-          this.$router.push('/studentmenu');
+          this.$router.push('/group-menu');
         }
       } catch (error) {
         if (error.response && error.response.status === 401) {

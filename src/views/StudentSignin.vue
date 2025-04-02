@@ -104,7 +104,7 @@ export default {
           password: this.password
         });
 
-        if (response.data) {
+        if (response.status === 200) {
           alert('회원가입이 완료되었습니다!');
           this.$router.push('/studentlogin');
         }
