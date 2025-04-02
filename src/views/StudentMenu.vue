@@ -31,13 +31,11 @@
           <p>학습 현황을 확인해보세요!</p>
         </div>
       </div>
-      <div class="menu-item logout" @click="logout">
-        <div class="menu-icon">👋</div>
-        <div class="menu-text">
-          <h3>로그아웃</h3>
-          <p>다음에 또 만나요!</p>
-        </div>
-      </div>
+    </div>
+    <div class="logout-container">
+      <button class="logout-button" @click="logout">
+        로그아웃
+      </button>
     </div>
     <div class="decoration">
       <span class="deco-item pencil">✏️</span>
@@ -256,97 +254,84 @@ h1 {
 
 .menu-buttons {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 380px));
-  gap: 30px 60px;
+  grid-template-columns: repeat(3, minmax(0, 280px));
+  gap: 50px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   position: relative;
   z-index: 1;
   padding: 0 30px;
   justify-content: center;
+  margin-bottom: 60px;
 }
 
 .menu-item {
-  padding: 25px;
+  aspect-ratio: 1;
+  padding: 40px;
   font-size: 1em;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: white;
   color: #2c3e50;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
-  text-align: left;
+  justify-content: center;
+  text-align: center;
   border: 2px solid transparent;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  height: 120px;
-  width: 100%;
 }
 
 .menu-icon {
-  font-size: 1.8em;
+  font-size: 3em;
+  margin-bottom: 25px;
   transition: transform 0.3s ease;
-  flex-shrink: 0;
-  width: 45px;
-  text-align: center;
 }
 
 .menu-text {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
+  width: 100%;
 }
 
 .menu-text h3 {
-  font-size: 1.2em;
+  font-size: 1.5em;
   font-weight: bold;
-  color: #2c3e50;
-  margin: 0;
-  line-height: 1.2;
+  margin-bottom: 12px;
 }
 
 .menu-text p {
-  font-size: 0.9em;
-  color: #5c6b7a;
-  margin: 0;
+  font-size: 1.1em;
   line-height: 1.4;
 }
 
-/* 상단 두 버튼과 하단 두 버튼 사이의 간격 조정 */
-.menu-item:nth-child(n+3) {
-  margin-top: 30px;
+.logout-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
 }
 
-.menu-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-}
-
-.menu-item:hover .menu-icon {
-  transform: scale(1.1) rotate(10deg);
-}
-
-.menu-item.logout {
-  background-color: #fff5f5;
-  border: 2px solid #ffc9c9;
-}
-
-.menu-item.logout:hover {
-  background-color: #ffe3e3;
-  border-color: #ff6b6b;
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(255,107,107,0.2);
-}
-
-.menu-item.logout .menu-text h3 {
+.logout-button {
+  background-color: white;
   color: #ff6b6b;
+  border: 2px solid #ff6b6b;
+  padding: 12px 40px;
+  border-radius: 25px;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.menu-item.logout .menu-text p {
-  color: #ff8787;
+.logout-button:hover {
+  background-color: #ff6b6b;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,107,107,0.2);
 }
 
 .decoration {
@@ -413,36 +398,37 @@ h1 {
   }
 
   .menu-buttons {
-    grid-template-columns: minmax(0, 400px);
-    gap: 25px;
+    grid-template-columns: repeat(2, minmax(0, 220px));
+    gap: 30px;
     padding: 0 20px;
+    margin-bottom: 40px;
   }
 
   .menu-item {
-    height: 100px;
-    padding: 20px;
+    padding: 25px;
   }
 
   .menu-icon {
-    font-size: 1.6em;
-    width: 35px;
-  }
-
-  .menu-text {
-    gap: 4px;
+    font-size: 2.2em;
+    margin-bottom: 15px;
   }
 
   .menu-text h3 {
-    font-size: 1.1em;
+    font-size: 1.2em;
+    margin-bottom: 8px;
   }
 
   .menu-text p {
-    font-size: 0.85em;
+    font-size: 0.95em;
   }
 
-  /* 모바일에서는 margin-top 제거 */
-  .menu-item:nth-child(n+3) {
-    margin-top: 0;
+  .logout-container {
+    margin-top: 40px;
+  }
+
+  .logout-button {
+    padding: 10px 30px;
+    font-size: 1em;
   }
 
   h1 {

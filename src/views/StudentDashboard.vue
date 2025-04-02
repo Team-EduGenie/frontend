@@ -261,6 +261,11 @@ export default {
   padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 100vh;
+  background-color: #fff5f5;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255,182,193,0.3) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(255,218,185,0.3) 0%, transparent 20%);
 }
 
 h1 {

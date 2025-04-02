@@ -506,7 +506,7 @@ h1 {
 
 .upload-section {
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   position: relative;
   z-index: 1;
 }

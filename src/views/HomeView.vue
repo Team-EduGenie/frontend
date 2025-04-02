@@ -49,7 +49,8 @@ export default {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 40px 20px;
+  margin: 0;
+  padding: 0;
   background-color: #f0f7ff;
   background-image: 
     radial-gradient(circle at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 20%),
@@ -61,6 +62,7 @@ export default {
 .header {
   text-align: center;
   margin-bottom: 60px;
+  padding-top: 40px;
 }
 
 h1 {
