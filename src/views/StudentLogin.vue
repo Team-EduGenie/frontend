@@ -32,13 +32,6 @@
         <span class="error-icon">😅</span>
         {{ errorMessage }}
       </p>
-      <div v-if="lastStudentName" class="recent-login">
-        <p class="recent-text">최근 로그인한 친구</p>
-        <button @click="loginWithRecentUser" class="recent-button">
-          <span class="recent-icon">👋</span>
-          {{ lastStudentName }}
-        </button>
-      </div>
     </div>
     <div class="decoration">
       <span class="deco-item pencil">✏️</span>
@@ -51,6 +44,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'StudentLogin',
   data() {
@@ -58,50 +53,31 @@ export default {
       username: '',
       password: '',
       errorMessage: '',
-      lastStudentName: '',
-      // 더미 데이터
-      dummyUsers: [
-        {
-          id: 1,
-          username: 'leader',
-          password: '1234',
-          name: '홍길동',
-          role: 'leader',
-          group: 'KT 그룹'
-        },
-        {
-          id: 2,
-          username: 'member',
-          password: '1234',
-          name: '김철수',
-          role: 'member',
-          group: 'KT 그룹'
-        }
-      ]
+      showError: false
     }
   },
   methods: {
-    handleLogin() {
-      // 더미 데이터에서 사용자 찾기
-      const user = this.dummyUsers.find(
-        u => u.username === this.username && u.password === this.password
-      );
+    async handleLogin() {
+      try {
+        const response = await axios.post('/auth', {
+          username: this.username,
+          password: this.password
+        });
 
-      if (user) {
-        // 사용자 정보를 localStorage에 저장
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        this.$router.push('/studentmenu');
-      } else {
-        alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+        if (response.data) {
+          // 사용자 정보를 localStorage에 저장
+          localStorage.setItem('userInfo', JSON.stringify(response.data));
+          // 로그인 성공 시 studentmenu로 이동
+          this.$router.push('/studentmenu');
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.';
+        } else {
+          this.errorMessage = '로그인 중 오류가 발생했습니다.';
+        }
       }
-    },
-    async loginWithRecentUser() {
-      this.username = this.lastStudentName;
-      await this.handleLogin();
     }
-  },
-  created() {
-    this.lastStudentName = localStorage.getItem('lastStudentName');
   }
 }
 </script>
@@ -302,45 +278,5 @@ h1 {
   .deco-item {
     font-size: 2em;
   }
-}
-
-.recent-login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.recent-text {
-  color: #ff8787;
-  font-size: 1.1em;
-  margin-bottom: 5px;
-}
-
-.recent-button {
-  padding: 12px 25px;
-  font-size: 1.2em;
-  background-color: #fff5f5;
-  color: #ff6b6b;
-  border: 2px solid #ffc9c9;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(255,107,107,0.2);
-}
-
-.recent-button:hover {
-  background-color: #ff8787;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255,107,107,0.3);
-}
-
-.recent-icon {
-  font-size: 1.2em;
 }
 </style> 

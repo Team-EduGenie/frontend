@@ -1,15 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import StudentLogin from '@/views/StudentLogin.vue'
-import StudentSignin from '@/views/StudentSignin.vue'
-import StudentManage from '../views/StudentManage.vue'
-import StudentMenu from '@/views/StudentMenu.vue'
-import Quiz from '@/views/Quiz.vue'
-import StudentDashboard from '@/views/StudentDashboard.vue'
-import Group from '@/views/Group.vue'
-import GroupManage from '@/views/GroupManage.vue'
+import StudentLogin from '../views/StudentLogin.vue'
+import StudentSignin from '../views/StudentSignin.vue'
+import StudentMenu from '../views/StudentMenu.vue'
+import StudentDashboard from '../views/StudentDashboard.vue'
+import GroupCreate from '../views/GroupCreate.vue'
 import Exam from '@/views/Exam.vue'
-import SubjectGroupSelect from '@/views/SubjectGroupSelect.vue'
+import ProblemCreate from '@/views/ProblemCreate.vue'
+import GroupMenu from '../views/GroupMenu.vue'
+import GroupParticipate from '../views/GroupParticipate.vue'
+import ExamResult from '../views/ExamResult.vue'
+import ManagerDashboard from '../views/ManagerDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,29 +21,19 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/signup',
-      name: 'signup',
-      component: StudentSignin
-    },
-    {
-      path: '/students',
-      name: 'students',
-      component: StudentManage
-    },
-    {
       path: '/studentlogin',
       name: 'studentlogin',
       component: StudentLogin
     },
     {
+      path: '/studentsignin',
+      name: 'studentsignin',
+      component: StudentSignin
+    },
+    {
       path: '/studentmenu',
       name: 'studentmenu',
       component: StudentMenu
-    },
-    {
-      path: '/quiz',
-      name: 'quiz',
-      component: Quiz
     },
     {
       path: '/student-dashboard',
@@ -52,12 +43,7 @@ const router = createRouter({
     {
       path: '/group',
       name: 'group',
-      component: Group
-    },
-    {
-      path: '/group-manage',
-      name: 'group-manage',
-      component: GroupManage
+      component: GroupCreate
     },
     {
       path: '/exam',
@@ -65,9 +51,29 @@ const router = createRouter({
       component: Exam
     },
     {
-      path: '/subject-group-select',
-      name: 'subject-group-select',
-      component: SubjectGroupSelect
+      path: '/problem-create',
+      name: 'problem-create',
+      component: ProblemCreate
+    },
+    {
+      path: '/group-menu',
+      name: 'group-menu',
+      component: GroupMenu
+    },
+    {
+      path: '/join-group',
+      name: 'join-group',
+      component: GroupParticipate
+    },
+    {
+      path: '/exam-result',
+      name: 'exam-result',
+      component: ExamResult
+    },
+    {
+      path: '/managerdashboard',
+      name: 'ManagerDashboard',
+      component: ManagerDashboard
     }
   ]
 })

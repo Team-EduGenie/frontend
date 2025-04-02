@@ -5,14 +5,14 @@
       <p class="subtitle">함께 배우고 성장하는 즐거운 공간</p>
     </div>
     <div class="button-container">
-      <router-link to="/signup" class="login-button signup">
+      <router-link to="/studentsignin" class="login-button signup">
         <span class="button-icon">📝</span>
         <div class="button-content">
           <span class="button-title">회원가입</span>
           <span class="button-description">새로운 계정 만들기</span>
         </div>
       </router-link>
-      <router-link to="/Studentlogin" class="login-button login">
+      <router-link to="/studentlogin" class="login-button login">
         <span class="button-icon">🔑</span>
         <div class="button-content">
           <span class="button-title">로그인</span>
@@ -30,7 +30,15 @@
 
 <script>
 export default {
-  name: 'HomeView'
+  name: 'HomeView',
+  methods: {
+    goToLogin() {
+      this.$router.push('/studentlogin');
+    },
+    goToSignIn() {
+      this.$router.push('/studentsignin');
+    }
+  }
 }
 </script>
 
