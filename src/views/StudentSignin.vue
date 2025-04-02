@@ -9,7 +9,7 @@
         <span class="input-icon">👤</span>
         <input 
           type="text" 
-          v-model="userName" 
+          v-model="username" 
           placeholder="이름을 입력해주세요" 
           class="signin-input"
         >
@@ -72,7 +72,7 @@ export default {
   name: 'StudentSignin',
   data() {
     return {
-      userName: '',
+      username: '',
       userId: '',
       password: '',
       confirmPassword: '',
@@ -82,7 +82,7 @@ export default {
   methods: {
     async handleSignin() {
       // 입력값 검증
-      if (!this.userName.trim() || !this.userId.trim() || !this.password || !this.confirmPassword) {
+      if (!this.username.trim() || !this.userId.trim() || !this.password || !this.confirmPassword) {
         this.errorMessage = '모든 항목을 입력해주세요.';
         return;
       }
