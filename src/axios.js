@@ -7,6 +7,22 @@ let config = {
 };
 const axiosInst = axios.create(config);
 
+axiosInst.interceptors.request.use(
+    (config) => {
+        const userInfo = localStorage.getItem('userInfo');
+        if (userInfo) {
+            const { accessToken } = JSON.parse(userInfo);
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export default axiosInst;
 
 //baseURL을 통해 /student요청 시 /api/student로 요청이 되기 때문에, 프록시 서버로 요청이 됌.

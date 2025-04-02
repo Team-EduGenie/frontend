@@ -14,7 +14,7 @@
           </div>
           <div 
             v-for="group in groups" 
-            :key="group.id" 
+            :key="group.id"
             class="group-item"
             @click="selectGroup(group.id)"
           >
@@ -61,6 +61,7 @@
 
 <script>
 import axios from 'axios'
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'GroupMenu',
@@ -89,13 +90,13 @@ export default {
           return;
         }
 
-        const response = await axios.get('/groups/joined', {
+        const response = await axiosInst.get('/groups/myGroup', {
           params: { userId }
         });
 
-        if (response.data.success) {
-          this.groups = response.data.groups;
-        }
+        this.groups = response.data;
+        console.log('Received groups:', this.groups);
+
       } catch (error) {
         console.error('가입된 그룹 목록을 가져오는데 실패했습니다:', error);
       }
