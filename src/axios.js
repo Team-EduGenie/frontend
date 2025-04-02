@@ -1,7 +1,7 @@
 // axios cros origin 설정
 import axios from "axios";
 let config = {
-  baseURL: "/api/v1",
+  baseURL: "/api",
   timeout: 600000,  // 10분으로 변경
   withCredentials: true,
 };
