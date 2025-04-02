@@ -1,3 +1,7 @@
+이 페이지는 로드되면 퀴즈정보를 가져옵니다
+url에서 subjectId를 가져옵니다.
+
+ 
 <template>
   <div class="exam-view">
     <div class="header">
@@ -115,11 +119,11 @@ export default {
   async created() {
     // URL에서 subjectId 가져오기
     const subjectId = this.$route.query.subjectId;
-    // if (!subjectId) {
-    //   console.error('과목 ID가 없습니다.');
-    //   this.$router.push('/studentmenu');
-    //   return;
-    // }
+    if (!subjectId) {
+      console.error('과목 ID가 없습니다.');
+      this.$router.push('/studentmenu');
+      return;
+    }
     this.subjectId = subjectId;
 
     // userInfo에서 groupId 가져오기
@@ -155,7 +159,6 @@ export default {
   },
   methods: {
     startExam() {
-      console.log('시험 시작 버튼이 클릭되었습니다.');
       this.isStarted = true;
       this.startTimer();
     },

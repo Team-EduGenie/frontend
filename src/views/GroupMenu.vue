@@ -16,10 +16,30 @@
           <h2>그룹 참가</h2>
           <p>기존 그룹에 참가해보세요!</p>
         </div>
-        <div class="menu-item group-choice" @click="goToGroupChoice">
-          <div class="menu-icon">👥</div>
-          <h2>그룹 선택</h2>
-          <p>학습할 그룹을 선택해보세요!</p>
+      </div>
+
+      <!-- 가입된 그룹 목록 섹션 추가 -->
+      <div class="joined-groups">
+        <h2>내가 가입한 그룹</h2>
+        <div class="groups-list">
+          <div v-if="groups.length === 0" class="no-groups">
+            아직 가입한 그룹이 없습니다.
+          </div>
+          <div 
+            v-for="group in groups" 
+            :key="group.groupId" 
+            class="group-item"
+            @click="selectGroup(group.groupId)"
+          >
+            <div class="group-info">
+              <span class="group-name">{{ group.groupName }}</span>
+              <span class="group-role">{{ group.isLeader ? '리더' : '멤버' }}</span>
+            </div>
+            <div class="group-stats">
+              <span class="member-count">👥 {{ group.memberCount }}명</span>
+              <span class="subject-count">📚 {{ group.subjectCount }}과목</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -40,8 +60,15 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'GroupMenu',
+  data() {
+    return {
+      groups: []
+    }
+  },
   methods: {
     goToGroup() {
       this.$router.push('/group');
@@ -52,9 +79,40 @@ export default {
     goBack() {
       this.$router.push('/studentlogin');
     },
-    goToGroupChoice() {
-      this.$router.push('/group-choice');
+    async fetchGroups() {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const userId = userInfo?.userId;
+        
+        if (!userId) {
+          console.error('사용자 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        const response = await axios.get('/groups/joined', {
+          params: { userId }
+        });
+
+        if (response.data.success) {
+          this.groups = response.data.groups;
+        }
+      } catch (error) {
+        console.error('가입된 그룹 목록을 가져오는데 실패했습니다:', error);
+      }
+    },
+    selectGroup(groupId) {
+      // 그룹 선택 시 localStorage에 저장하고 메인 메뉴로 이동
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      userInfo.groupInfo = {
+        groupId,
+        isLeader: this.groups.find(g => g.groupId === groupId)?.isLeader || false
+      };
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      this.$router.push('/studentmenu');
     }
+  },
+  async created() {
+    await this.fetchGroups();
   }
 }
 </script>
@@ -230,6 +288,75 @@ h1 {
   font-weight: 500;
 }
 
+.joined-groups {
+  margin-top: 40px;
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.joined-groups h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  text-align: center;
+}
+
+.groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.group-item {
+  background: #fff5f5;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.group-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,107,107,0.2);
+}
+
+.group-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.group-name {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.group-role {
+  background: #ff6b6b;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.9em;
+}
+
+.group-stats {
+  display: flex;
+  gap: 15px;
+  color: #5c6b7a;
+  font-size: 0.9em;
+}
+
+.no-groups {
+  text-align: center;
+  color: #5c6b7a;
+  padding: 40px;
+  font-size: 1.1em;
+}
+
 @media (max-width: 768px) {
   h1 {
     font-size: 2.5em;
@@ -272,6 +399,27 @@ h1 {
   .back-button {
     font-size: 1.2em;
     padding: 12px 25px;
+  }
+
+  .joined-groups {
+    margin-top: 30px;
+    padding: 20px;
+  }
+
+  .joined-groups h2 {
+    font-size: 1.5em;
+  }
+
+  .group-item {
+    padding: 15px;
+  }
+
+  .group-name {
+    font-size: 1.1em;
+  }
+
+  .group-stats {
+    font-size: 0.8em;
   }
 }
 </style> 

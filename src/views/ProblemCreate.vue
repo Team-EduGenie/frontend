@@ -336,7 +336,7 @@ export default {
         };
 
         // API 호출
-        const response = await axios.post('/createQuiz', requestData);
+        const response = await axios.post('/generate-from-pdf', requestData);
 
         if (response.data.success) {
           // 문제 세트 목록 새로고침

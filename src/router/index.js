@@ -11,7 +11,6 @@ import GroupMenu from '../views/GroupMenu.vue'
 import GroupParticipate from '../views/GroupParticipate.vue'
 import ExamResult from '../views/ExamResult.vue'
 import ManagerDashboard from '../views/ManagerDashboard.vue'
-import GroupChoice from '../views/GroupChoice.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -75,11 +74,6 @@ const router = createRouter({
       path: '/managerdashboard',
       name: 'ManagerDashboard',
       component: ManagerDashboard
-    },
-    {
-      path: '/group-choice',
-      name: 'group-choice',
-      component: GroupChoice
     }
   ]
 })

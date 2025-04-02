@@ -1,3 +1,7 @@
+<!-- 이 페이지는 학생이 시험을 치고 난 후 결과를 보는 페이지입니다.
+backend의 quizId를 기준으로 quiz-user table에서 isCorrenct를 가져오고, quiz테이블에서 problem, answer, explanation을 가져옵니다.
+데이터를 가져오고 나면 문제 번호, 정답 여부, 문제, 답, 해설을 테이블로 출력합니다.
+해설을 클릭하면 해설을 볼 수 있습니다. -->
 <template>
   <div class="exam-result-view">
     <div class="result-container">
@@ -6,11 +10,6 @@
       <!-- 에러 메시지 -->
       <div v-if="error" class="error-message">
         {{ error }}
-      </div>
-
-      <!-- 로딩 상태 -->
-      <div v-if="loading" class="loading-message">
-        해설을 생성하는 중입니다...
       </div>
       
       <!-- 결과 테이블 -->
@@ -71,25 +70,29 @@ export default {
   data() {
     return {
       problems: [],
-      loading: false,
       error: null
     }
   },
   async created() {
     try {
-      // URL에서 subjectId와 groupId 가져오기
+      // URL에서 subjectId 가져오기
       const subjectId = this.$route.query.subjectId;
-      const groupId = this.$route.query.groupId;
       
-      if (!subjectId || !groupId) {
-        throw new Error('필수 파라미터가 누락되었습니다.');
+      if (!subjectId) {
+        throw new Error('과목 ID가 누락되었습니다.');
+      }
+
+      // userInfo에서 userId 가져오기
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      if (!userInfo || !userInfo.userId) {
+        throw new Error('사용자 정보를 찾을 수 없습니다.');
       }
 
       // 퀴즈 결과 데이터 가져오기
       const response = await axios.get(`/quiz/results`, {
-        params: {
+        params: { 
           subjectId,
-          groupId
+          userId: userInfo.userId
         }
       });
 
@@ -97,9 +100,8 @@ export default {
       this.problems = response.data.map(result => ({
         question: result.question,
         answer: result.answer,
-        options: result.options,
         isCorrect: result.isCorrect,
-        explanation: null, // 초기에는 null로 설정
+        explanation: result.explanation,
         showExplanation: false
       }));
     } catch (error) {
@@ -110,31 +112,7 @@ export default {
   methods: {
     async toggleExplanation(index) {
       const problem = this.problems[index];
-      
-      // 이미 해설이 있는 경우는 토글만 수행
-      if (problem.explanation) {
-        problem.showExplanation = !problem.showExplanation;
-        return;
-      }
-
-      // 해설이 없는 경우 OpenAI API 호출
-      try {
-        this.loading = true;
-        const response = await axios.post('/explanation', {
-          question: problem.question,
-          answer: problem.answer,
-          options: problem.options
-        });
-
-        problem.explanation = response.data.explanation;
-        problem.showExplanation = true;
-      } catch (error) {
-        console.error('해설을 가져오는데 실패했습니다:', error);
-        problem.explanation = '해설을 불러오는데 실패했습니다.';
-        problem.showExplanation = true;
-      } finally {
-        this.loading = false;
-      }
+      problem.showExplanation = !problem.showExplanation;
     },
     goToMainMenu() {
       this.$router.push('/studentmenu');
@@ -303,15 +281,6 @@ h1 {
 .error-message {
   background-color: #ffe3e3;
   color: #ff6b6b;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.loading-message {
-  background-color: #e3fcef;
-  color: #00b894;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
