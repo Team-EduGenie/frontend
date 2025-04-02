@@ -5,6 +5,32 @@
       <p class="subtitle">그룹을 만들어보거나 참가해보세요!</p>
     </div>
     <div class="menu-container">
+      <!-- 가입된 그룹 목록 섹션을 먼저 배치 -->
+      <div class="joined-groups">
+        <h2>내가 가입한 그룹</h2>
+        <div class="groups-list">
+          <div v-if="groups.length === 0" class="no-groups">
+            아직 가입한 그룹이 없습니다.
+          </div>
+          <div 
+            v-for="group in groups" 
+            :key="group.id" 
+            class="group-item"
+            @click="selectGroup(group.id)"
+          >
+            <div class="group-info">
+              <span class="group-name">{{ group.name }}</span>
+              <span class="group-role">{{ group.role === 'leader' ? '리더' : '멤버' }}</span>
+            </div>
+            <div class="group-stats">
+              <span class="member-count">👥 {{ group.memberCount }}명</span>
+              <span class="subject-count">📚 {{ group.subjectCount }}과목</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 그룹 만들기/참가 메뉴 -->
       <div class="menu-grid">
         <div class="menu-item create-group" @click="goToGroup">
           <div class="menu-icon">🎯</div>
@@ -15,31 +41,6 @@
           <div class="menu-icon">🤝</div>
           <h2>그룹 참가</h2>
           <p>기존 그룹에 참가해보세요!</p>
-        </div>
-      </div>
-
-      <!-- 가입된 그룹 목록 섹션 추가 -->
-      <div class="joined-groups">
-        <h2>내가 가입한 그룹</h2>
-        <div class="groups-list">
-          <div v-if="groups.length === 0" class="no-groups">
-            아직 가입한 그룹이 없습니다.
-          </div>
-          <div 
-            v-for="group in groups" 
-            :key="group.groupId" 
-            class="group-item"
-            @click="selectGroup(group.groupId)"
-          >
-            <div class="group-info">
-              <span class="group-name">{{ group.groupName }}</span>
-              <span class="group-role">{{ group.isLeader ? '리더' : '멤버' }}</span>
-            </div>
-            <div class="group-stats">
-              <span class="member-count">👥 {{ group.memberCount }}명</span>
-              <span class="subject-count">📚 {{ group.subjectCount }}과목</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -54,7 +55,6 @@
       <span class="deco-item book">📚</span>
       <span class="deco-item ruler">📏</span>
       <span class="deco-item backpack">🎒</span>
-      <span class="deco-item apple">🍎</span>
     </div>
   </div>
 </template>
@@ -122,7 +122,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
   padding: 40px 20px;
   background-color: #fff5f5;
@@ -130,7 +129,6 @@ export default {
     radial-gradient(circle at 10% 20%, rgba(255,182,193,0.3) 0%, transparent 20%),
     radial-gradient(circle at 90% 80%, rgba(255,218,185,0.3) 0%, transparent 20%);
   position: relative;
-  overflow: hidden;
 }
 
 .header {
@@ -162,23 +160,102 @@ h1 {
 .menu-container {
   width: 100%;
   max-width: 800px;
-  position: relative;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+}
+
+.joined-groups {
+  background: white;
+  border-radius: 30px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(255,135,135,0.15);
+  width: 100%;
+}
+
+.joined-groups h2 {
+  color: #ff8787;
+  font-size: 2em;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.group-item {
+  background: #fff5f5;
+  border-radius: 20px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(255,135,135,0.1);
+  width: 100%;
+}
+
+.group-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255,135,135,0.2);
+  border-color: #ffd5d5;
+}
+
+.group-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.group-name {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.group-role {
+  background: #ff8787;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.9em;
+  box-shadow: 0 2px 5px rgba(255,135,135,0.2);
+}
+
+.group-stats {
+  display: flex;
+  gap: 15px;
+  color: #5c6b7a;
+  font-size: 0.9em;
+}
+
+.no-groups {
+  text-align: center;
+  color: #ff8787;
+  padding: 30px;
+  font-size: 1.2em;
+  background: white;
+  border-radius: 20px;
+  margin: 20px 0;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  padding: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 50px;
   width: 100%;
-  max-width: 1200px;
+  padding: 0 40px;
 }
 
 .menu-item {
-  background-color: white;
+  background: #ff8787;
   border-radius: 30px;
-  padding: 40px;
+  padding: 30px 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -186,37 +263,47 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  height: 100%;
-  min-width: 250px;
+  justify-content: center;
+  gap: 15px;
+  height: 180px;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 .menu-item:hover {
-  transform: translateY(-10px);
+  transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(255,135,135,0.3);
-}
-
-.menu-icon {
-  font-size: 4em;
-  margin-bottom: 10px;
-  animation: bounce 2s infinite;
+  background: #ff6b6b;
 }
 
 .menu-item h2 {
-  color: #ff6b6b;
-  font-size: 2em;
+  color: white;
+  font-size: 1.8em;
   margin: 0;
   font-weight: bold;
 }
 
 .menu-item p {
-  color: #ff8787;
-  font-size: 1.2em;
+  color: white;
+  font-size: 1.1em;
   margin: 0;
+  opacity: 0.9;
 }
 
-.create-group, .join-group, .group-choice {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+.create-group {
+  background: #ff8787;
+}
+
+.join-group {
+  background: #ff9b9b;
+}
+
+.menu-icon {
+  font-size: 2.8em;
+  margin-bottom: 5px;
+  animation: bounce 2s infinite;
+  color: white;
 }
 
 .decoration {
@@ -236,7 +323,6 @@ h1 {
 .book { top: 25%; right: 15%; animation-delay: 1s; }
 .ruler { bottom: 20%; left: 15%; animation-delay: 2s; }
 .backpack { bottom: 30%; right: 10%; animation-delay: 1.5s; }
-.apple { top: 40%; left: 50%; animation-delay: 0.5s; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -288,75 +374,6 @@ h1 {
   font-weight: 500;
 }
 
-.joined-groups {
-  margin-top: 40px;
-  background: white;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.joined-groups h2 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-size: 1.8em;
-  text-align: center;
-}
-
-.groups-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.group-item {
-  background: #fff5f5;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.group-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255,107,107,0.2);
-}
-
-.group-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.group-name {
-  font-size: 1.2em;
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-.group-role {
-  background: #ff6b6b;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 0.9em;
-}
-
-.group-stats {
-  display: flex;
-  gap: 15px;
-  color: #5c6b7a;
-  font-size: 0.9em;
-}
-
-.no-groups {
-  text-align: center;
-  color: #5c6b7a;
-  padding: 40px;
-  font-size: 1.1em;
-}
-
 @media (max-width: 768px) {
   h1 {
     font-size: 2.5em;
@@ -366,25 +383,40 @@ h1 {
     font-size: 1.3em;
   }
 
-  .menu-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+  .menu-container {
+    padding: 15px;
   }
 
+  .joined-groups, .menu-grid {
+    width: calc(100% - 30px);
+    margin: 0 15px;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 0 20px;
+  }
+  
   .menu-item {
-    padding: 30px;
+    height: 160px;
+    padding: 20px;
+  }
+
+  .joined-groups h2 {
+    font-size: 1.6em;
   }
 
   .menu-icon {
-    font-size: 3em;
+    font-size: 2.5em;
   }
 
   .menu-item h2 {
-    font-size: 1.8em;
+    font-size: 1.5em;
   }
 
   .menu-item p {
-    font-size: 1.1em;
+    font-size: 1em;
   }
 
   .deco-item {
@@ -399,27 +431,6 @@ h1 {
   .back-button {
     font-size: 1.2em;
     padding: 12px 25px;
-  }
-
-  .joined-groups {
-    margin-top: 30px;
-    padding: 20px;
-  }
-
-  .joined-groups h2 {
-    font-size: 1.5em;
-  }
-
-  .group-item {
-    padding: 15px;
-  }
-
-  .group-name {
-    font-size: 1.1em;
-  }
-
-  .group-stats {
-    font-size: 0.8em;
   }
 }
 </style> 

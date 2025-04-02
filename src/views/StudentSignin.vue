@@ -61,7 +61,6 @@
       <span class="deco-item book">📚</span>
       <span class="deco-item ruler">📏</span>
       <span class="deco-item backpack">🎒</span>
-      <span class="deco-item apple">🍎</span>
     </div>
   </div>
 </template>
@@ -306,7 +305,6 @@ h1 {
 .book { top: 25%; right: 15%; animation-delay: 1s; }
 .ruler { bottom: 20%; left: 15%; animation-delay: 2s; }
 .backpack { bottom: 30%; right: 10%; animation-delay: 1.5s; }
-.apple { top: 40%; left: 50%; animation-delay: 0.5s; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
