@@ -74,6 +74,81 @@ export default {
     }
   },
   async created() {
+    // 테스트용 더미 데이터
+    this.problems = [
+      {
+        question: "AI 거버넌스 플랫폼이 제공하는 '투명성 및 설명 가능성' 기능은 사용자가 AI의 판단 근거를 이해할 수 있도록 합니다. 이 기능을 강화하기 위 해 AI 개발자들이 집중해야 할 요소는 무엇일까요?",
+        answer: "알고리즘 최적화",
+        isCorrect: true,
+        explanation: "AI의 투명성과 설명 가능성을 높이기 위해서는 알고리즘의 동작 원리와 의사결정 과정을 명확하게 설명할 수 있어야 합니다. 이를 위해 알고리즘의 최적화와 함께 의사결정 로직의 개선이 필요합니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 시스템의 윤리적 사용을 보장하기 위한 가장 중요한 원칙은 무엇일까요?",
+        answer: "공정성",
+        isCorrect: false,
+        explanation: "AI 시스템의 윤리적 사용을 위해서는 공정성, 투명성, 책임성, 프라이버시 보호 등 여러 원칙이 중요합니다. 특히 공정성은 AI가 모든 사용자에게 동등한 기회를 제공하고 편견 없이 작동해야 함을 의미합니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 모델의 성능을 평가할 때 가장 중요한 지표는 무엇일까요?",
+        answer: "정확도",
+        isCorrect: true,
+        explanation: "AI 모델의 성능을 평가할 때는 정확도, 정밀도, 재현율, F1 점수 등 여러 지표를 종합적으로 고려해야 합니다. 특히 정확도는 전체 예측 중 올바른 예측의 비율을 나타내는 중요한 지표입니다.",
+        showExplanation: false
+      },
+      {
+        question: "머신러닝 모델의 과적합(Overfitting)을 방지하기 위한 방법은?",
+        answer: "데이터 증강",
+        isCorrect: false,
+        explanation: "과적합을 방지하기 위해서는 데이터 증강, 정규화, 드롭아웃, 조기 종료 등 다양한 방법을 사용할 수 있습니다. 특히 데이터 증강은 학습 데이터의 다양성을 높여 모델의 일반화 성능을 향상시킵니다.",
+        showExplanation: false
+      },
+      {
+        question: "딥러닝에서 사용되는 활성화 함수의 역할은?",
+        answer: "비선형성 도입",
+        isCorrect: true,
+        explanation: "활성화 함수는 신경망에 비선형성을 도입하여 복잡한 패턴을 학습할 수 있게 합니다. 대표적인 활성화 함수로는 ReLU, Sigmoid, Tanh 등이 있습니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 시스템의 보안을 강화하기 위한 가장 효과적인 방법은?",
+        answer: "적대적 공격 방어",
+        isCorrect: true,
+        explanation: "AI 시스템의 보안을 강화하기 위해서는 적대적 공격 방어, 데이터 암호화, 접근 제어 등 다양한 방법을 사용해야 합니다. 특히 적대적 공격 방어는 AI 모델이 악의적인 입력에 대해 강건하게 대응할 수 있도록 합니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 모델의 학습에 사용되는 손실 함수의 역할은?",
+        answer: "성능 측정",
+        isCorrect: false,
+        explanation: "손실 함수는 모델의 예측과 실제 값 사이의 차이를 측정하여 모델의 성능을 평가합니다. 이를 통해 모델의 학습 방향을 결정하고 최적화를 수행합니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 시스템의 지속적인 개선을 위한 가장 중요한 요소는?",
+        answer: "피드백 루프",
+        isCorrect: true,
+        explanation: "AI 시스템의 지속적인 개선을 위해서는 사용자 피드백, 성능 모니터링, 데이터 품질 관리 등이 중요합니다. 특히 피드백 루프는 시스템의 성능을 지속적으로 평가하고 개선하는 데 핵심적인 역할을 합니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 모델의 배포 후 모니터링에서 가장 중요한 지표는?",
+        answer: "성능 저하",
+        isCorrect: true,
+        explanation: "AI 모델 배포 후에는 성능 저하, 데이터 드리프트, 이상 징후 등을 지속적으로 모니터링해야 합니다. 이를 통해 모델의 신뢰성과 안정성을 유지할 수 있습니다.",
+        showExplanation: false
+      },
+      {
+        question: "AI 시스템의 신뢰성을 높이기 위한 가장 효과적인 방법은?",
+        answer: "검증 및 검증",
+        isCorrect: false,
+        explanation: "AI 시스템의 신뢰성을 높이기 위해서는 철저한 검증과 검증, 투명한 의사결정 과정, 지속적인 모니터링 등이 필요합니다. 특히 검증과 검증은 시스템의 정확성과 안정성을 보장하는 데 중요합니다.",
+        showExplanation: false
+      }
+    ];
+
+    /* 원래 코드
     try {
       // URL에서 subjectId 가져오기
       const subjectId = this.$route.query.subjectId;
@@ -108,6 +183,7 @@ export default {
       console.error('퀴즈 결과를 가져오는데 실패했습니다:', error);
       this.error = '퀴즈 결과를 불러오는데 실패했습니다.';
     }
+    */
   },
   methods: {
     async toggleExplanation(index) {
@@ -129,9 +205,10 @@ export default {
 }
 
 .result-container {
-  max-width: 1200px;
+  max-width: 1800px;
   margin: 0 auto;
   position: relative;
+  padding: 0 20px;
 }
 
 h1 {
@@ -147,26 +224,29 @@ h1 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   margin-bottom: 30px;
+  width: 100%;
 }
 
 .result-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
+  table-layout: fixed;
 }
 
 .result-table th,
 .result-table td {
-  padding: 15px;
+  padding: 20px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  word-wrap: break-word;
 }
 
-.result-table th {
-  background-color: #f8f9fa;
-  color: #2c3e50;
-  font-weight: 600;
-}
+.result-table th:nth-child(1) { width: 8%; }  /* 번호 */
+.result-table th:nth-child(2) { width: 12%; } /* 정답 여부 */
+.result-table th:nth-child(3) { width: 35%; } /* 문제 */
+.result-table th:nth-child(4) { width: 20%; } /* 답 */
+.result-table th:nth-child(5) { width: 25%; } /* 해설 */
 
 .result-badge {
   display: inline-block;
@@ -209,13 +289,13 @@ h1 {
 }
 
 @media (max-width: 768px) {
-  .exam-result-view {
-    padding: 10px;
+  .result-container {
+    padding: 0 10px;
   }
 
   .result-table th,
   .result-table td {
-    padding: 10px;
+    padding: 15px;
     font-size: 0.9em;
   }
 

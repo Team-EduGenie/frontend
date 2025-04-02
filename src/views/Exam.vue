@@ -117,6 +117,46 @@ export default {
     }
   },
   async created() {
+    // 테스트용 코드 시작
+    this.subjectId = 1;
+    
+    const testUserInfo = {
+      name: '테스트 사용자',
+      groupInfo: {
+        groupId: 1,
+        name: '테스트 그룹',
+        isGroupLeader: false
+      }
+    };
+    localStorage.setItem('userInfo', JSON.stringify(testUserInfo));
+
+    try {
+      this.questions = [
+        {
+          id: 1,
+          question: "AI 거버넌스 플랫폼이 제공하는 '투명성 및 설명 가능성' 기능은 사용자가 AI의 판단 근거를 이해할 수 있도록 합니다. 이 기능을 강화하기 위 해 AI 개발자들이 집중해야 할 요소는 무엇일까요?",
+          options: ["알고리즘 최적화", "데이터 압축 기술", "의사결정 로직의 개선", "시스템 성능 향상"],
+          answer: 0
+        },
+        {
+          id: 2,
+          question: "테스트 문제 2",
+          options: ["보기 1", "보기 2", "보기 3", "보기 4"],
+          answer: 1
+        },
+        {
+          id: 3,
+          question: "테스트 문제 3",
+          options: ["보기 1", "보기 2", "보기 3", "보기 4"],
+          answer: 2
+        }
+      ];
+    } catch (error) {
+      console.error('퀴즈 문제를 가져오는데 실패했습니다:', error);
+    }
+    // 테스트용 코드 끝
+
+    /* 원래 코드
     // URL에서 subjectId 가져오기
     const subjectId = this.$route.query.subjectId;
     if (!subjectId) {
@@ -146,6 +186,7 @@ export default {
       console.error('퀴즈 문제를 가져오는데 실패했습니다:', error);
       // this.$router.push('/studentmenu');
     }
+    */
   },
   computed: {
     currentQuestion() {
