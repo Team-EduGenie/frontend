@@ -289,20 +289,20 @@ export default {
       this.wrongQuizzes = [
         {
           id: 1,
-          number: 1,
-          question: '클라우드 컴퓨팅의 주요 특징은 무엇인가요?',
-          userAnswer: '확장성',
-          correctAnswer: '유연성',
-          explanation: '클라우드 컴퓨팅의 가장 중요한 특징은 유연성입니다. 필요에 따라 자원을 즉시 확장하거나 축소할 수 있어 비즈니스 요구사항에 빠르게 대응할 수 있습니다.',
+          number: 2,
+          question: "AI 거버넌스 플랫폼이 구현해야 하는 윤리적 고려 중 하나는 AI의 의사결정이 특정 그룹을 차별하지 않도록 모니터링하는 것입니다. 이를 효과적으로 수행하기 위해 가장 중요한 요소는 무엇일까요?",
+          userAnswer: "고속 데이터 처리",
+          correctAnswer: "편향 감지 기술",
+          explanation: "AI 시스템의 편향을 감지하고 관리하는 것은 AI 거버넌스의 핵심 요소입니다. 편향 감지 기술은 AI의 의사결정이 특정 그룹에 대해 불공정하지 않도록 모니터링하고, 필요한 경우 조정할 수 있게 해줍니다.",
           date: new Date().toLocaleDateString('ko-KR')
         },
         {
           id: 2,
-          number: 2,
-          question: 'DevOps의 핵심 원칙은?',
-          userAnswer: '자동화',
-          correctAnswer: '협업',
-          explanation: 'DevOps의 핵심은 개발(Development)과 운영(Operations) 팀 간의 협업입니다. 자동화도 중요한 요소이지만, 가장 근본적인 원칙은 팀 간의 원활한 협업과 소통입니다.',
+          number: 4,
+          question: "허위정보 보안의 목적은 가짜 뉴스와 조작된 콘텐츠가 초래할 수 있는 피해를 최소화하는 것입니다. 네이버의 사례를 바탕으로 이러한 시스템을 구축하는 데 중요한 기술은 무엇일까요?",
+          userAnswer: "블록체인",
+          correctAnswer: "인공지능과 머신러닝",
+          explanation: "인공지능과 머신러닝은 대량의 데이터를 분석하여 허위정보를 식별하는 데 효과적입니다. 특히 자연어 처리와 패턴 인식 기술을 통해 가짜 뉴스와 조작된 콘텐츠를 자동으로 감지할 수 있습니다.",
           date: new Date().toLocaleDateString('ko-KR')
         }
       ];

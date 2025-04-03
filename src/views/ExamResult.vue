@@ -75,35 +75,79 @@ export default {
   },
   async created() {
     try {
-      // URL에서 subjectId 가져오기
-      const subjectId = this.$route.query.subjectId;
-      
-      if (!subjectId) {
-        throw new Error('과목 ID가 누락되었습니다.');
-      }
-
-      // userInfo에서 userId 가져오기
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      if (!userInfo || !userInfo.userId) {
-        throw new Error('사용자 정보를 찾을 수 없습니다.');
-      }
-
-      // 퀴즈 결과 데이터 가져오기
-      const response = await axios.get(`/quiz/results`, {
-        params: { 
-          subjectId,
-          userId: userInfo.userId
+      // 더미 데이터 설정
+      this.problems = [
+        {
+          question: "AI 거버넌스 플랫폼의 주요 목적 중 하나는 AI 시스템의 의사결정 과정을 사용자에게 명확하게 설명할 수 있도록 하는 것입니다. 이 목적을 달성하기 위해 가장 중요한 기능은 무엇입니까?",
+          answer: "투명성 및 설명 가능성",
+          isCorrect: true,
+          explanation: "AI 거버넌스 플랫폼의 투명성 및 설명 가능성 기능은 AI의 의사결정 과정을 이해하기 쉽게 설명하여 사용자의 신뢰를 얻고, AI 시스템의 책임성을 확보하는 데 중요한 역할을 합니다.",
+          showExplanation: false
+        },
+        {
+          question: "AI 거버넌스 플랫폼이 구현해야 하는 윤리적 고려 중 하나는 AI의 의사결정이 특정 그룹을 차별하지 않도록 모니터링하는 것입니다. 이를 효과적으로 수행하기 위해 가장 중요한 요소는 무엇일까요?",
+          answer: "편향 감지 기술",
+          isCorrect: false,
+          explanation: "AI 시스템의 편향을 감지하고 관리하는 것은 AI 거버넌스의 핵심 요소입니다. 편향 감지 기술은 AI의 의사결정이 특정 그룹에 대해 불공정하지 않도록 모니터링하고, 필요한 경우 조정할 수 있게 해줍니다.",
+          showExplanation: false
+        },
+        {
+          question: "Mastercard가 AI 거버넌스 플랫폼을 도입하여 AI 프로젝트를 중앙에서 추적 관리하고 제3자 AI 공급업체의 신뢰성을 검증하는 사례를 기반으로, 이 플랫폼이 제공하는 주요 가치는 무엇일까요?",
+          answer: "컴플라이언스 및 감사 용이성",
+          isCorrect: true,
+          explanation: "AI 거버넌스 플랫폼은 AI 프로젝트의 전 과정을 추적하고 관리하여 규제 준수와 감사를 용이하게 합니다. 이를 통해 기업은 AI 시스템의 신뢰성과 안전성을 확보할 수 있습니다.",
+          showExplanation: false
+        },
+        {
+          question: "허위정보 보안의 목적은 가짜 뉴스와 조작된 콘텐츠가 초래할 수 있는 피해를 최소화하는 것입니다. 네이버의 사례를 바탕으로 이러한 시스템을 구축하는 데 중요한 기술은 무엇일까요?",
+          answer: "인공지능과 머신러닝",
+          isCorrect: false,
+          explanation: "인공지능과 머신러닝은 대량의 데이터를 분석하여 허위정보를 식별하는 데 효과적입니다. 특히 자연어 처리와 패턴 인식 기술을 통해 가짜 뉴스와 조작된 콘텐츠를 자동으로 감지할 수 있습니다.",
+          showExplanation: false
+        },
+        {
+          question: "AI 거버넌스 플랫폼은 AI의 어떤 측면을 감시하여 편향되지 않도록 하며, 기업이 윤리적 원칙과 법규를 준수하도록 지원하는가?",
+          answer: "모든 답변이 옳다",
+          isCorrect: true,
+          explanation: "AI 거버넌스 플랫폼은 데이터 수집부터 모델 학습, 의사결정 과정, 운영 단계까지 AI 시스템의 전 과정을 감시하고 관리합니다. 이를 통해 기업이 윤리적 원칙과 법규를 준수하도록 지원합니다.",
+          showExplanation: false
+        },
+        {
+          question: "AI 거버넌스 플랫폼이 제공하는 '투명성 및 설명 가능성' 기능은 사용자가 AI의 판단 근거를 이해할 수 있도록 합니다. 이 기능을 강화하기 위해 AI 개발자들이 집중해야 할 요소는 무엇일까요?",
+          answer: "의사결정 로직의 개선",
+          isCorrect: true,
+          explanation: "AI 시스템의 의사결정 로직을 개선하여 사용자가 이해하기 쉽게 만드는 것이 투명성과 설명 가능성을 높이는 핵심입니다. 복잡한 알고리즘을 단순화하고, 의사결정 과정을 명확하게 설명할 수 있도록 하는 것이 중요합니다.",
+          showExplanation: false
+        },
+        {
+          question: "AI 거버넌스 플랫폼에서 AI의 '데이터 품질 및 편향 관리' 기능의 주요 목적은 무엇입니까?",
+          answer: "신뢰할 수 있는 데이터 사용을 보장하기 위함",
+          isCorrect: true,
+          explanation: "데이터 품질 및 편향 관리는 AI 시스템이 신뢰할 수 있는 데이터를 사용하도록 보장하는 것이 목적입니다. 이를 통해 AI의 의사결정이 공정하고 정확하게 이루어질 수 있습니다.",
+          showExplanation: false
+        },
+        {
+          question: "AI가 채용 과정에서 특정 그룹을 차별하지 않도록 감시하는 기능은 AI 거버넌스 플랫폼의 어떤 속성과 관련이 있습니까?",
+          answer: "공정성",
+          isCorrect: true,
+          explanation: "AI 거버넌스 플랫폼의 공정성은 AI 시스템이 특정 그룹을 차별하지 않고 공평한 의사결정을 내리도록 보장하는 속성입니다. 특히 채용 과정에서는 이러한 공정성이 매우 중요합니다.",
+          showExplanation: false
+        },
+        {
+          question: "금융 AI가 대출 심사 시 공정한 결정을 내릴 수 있도록 점검하는 것은 AI 거버넌스 플랫폼의 어떤 측면을 강화하는가?",
+          answer: "규제 준수",
+          isCorrect: true,
+          explanation: "금융 분야에서 AI 시스템의 공정한 의사결정을 점검하는 것은 규제 준수 측면을 강화합니다. 이는 금융 규제 당국의 요구사항을 충족하고, 고객의 신뢰를 얻는 데 중요합니다.",
+          showExplanation: false
+        },
+        {
+          question: "AI 거버넌스 플랫폼의 설계에 있어 '프라이버시 보호'를 강화하는 방법 중 하나는 무엇일까요?",
+          answer: "사용자 인증 메커니즘 강화",
+          isCorrect: true,
+          explanation: "사용자 인증 메커니즘을 강화하는 것은 AI 거버넌스 플랫폼의 프라이버시 보호를 강화하는 중요한 방법입니다. 이를 통해 개인정보의 무단 접근을 방지하고, 데이터 보안을 강화할 수 있습니다.",
+          showExplanation: false
         }
-      });
-
-      // 데이터 형식 변환
-      this.problems = response.data.map(result => ({
-        question: result.question,
-        answer: result.answer,
-        isCorrect: result.isCorrect,
-        explanation: result.explanation,
-        showExplanation: false
-      }));
+      ];
     } catch (error) {
       console.error('퀴즈 결과를 가져오는데 실패했습니다:', error);
       this.error = '퀴즈 결과를 불러오는데 실패했습니다.';

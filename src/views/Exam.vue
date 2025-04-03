@@ -202,24 +202,27 @@ export default {
         });
       }
 
+      // 백엔드 연결 코드 주석 처리
+      /*
       try {
         // 답안 제출
         await axios.post('/quiz/submit', {
           subjectId: this.subjectId,
           answers: this.userAnswers
         });
-
-        // 결과 페이지로 이동
-        this.$router.push({
-          path: '/exam-result',
-          query: {
-            subjectId: this.subjectId
-          }
-        });
       } catch (error) {
         console.error('답안 제출에 실패했습니다:', error);
         alert('답안 제출에 실패했습니다. 다시 시도해주세요.');
       }
+      */
+
+      // 결과 페이지로 바로 이동
+      this.$router.push({
+        path: '/exam-result',
+        query: {
+          subjectId: this.subjectId
+        }
+      });
     }
   },
   beforeDestroy() {
