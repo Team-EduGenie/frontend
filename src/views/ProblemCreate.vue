@@ -213,6 +213,8 @@ export default {
       if (!this.selectedFile) return;
       
       try {
+        // 백엔드 연동 코드 주석 처리
+        /*
         // userInfo에서 groupId 가져오기
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const groupId = userInfo?.groupInfo?.groupId;
@@ -247,6 +249,18 @@ export default {
         } else {
           alert('파일 업로드에 실패했습니다.');
         }
+        */
+
+        // 프론트엔드에서만 동작하는 코드
+        this.uploadedFiles.push({
+          name: this.selectedFile.name,
+          size: this.selectedFile.size,
+          selected: false
+        });
+        
+        alert('파일이 성공적으로 업로드되었습니다!');
+        this.selectedFile = null;
+
       } catch (error) {
         console.error('파일 업로드 중 오류 발생:', error);
         alert('파일 업로드 중 오류가 발생했습니다.');
@@ -262,6 +276,8 @@ export default {
       }
 
       try {
+        // 백엔드 연동 코드 주석 처리
+        /*
         // userInfo에서 groupId 가져오기
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const groupId = userInfo?.groupInfo?.groupId;
@@ -294,6 +310,19 @@ export default {
         } else {
           alert('문제 세트 생성에 실패했습니다.');
         }
+        */
+
+        // 프론트엔드에서만 동작하는 코드
+        const newSubject = {
+          id: this.subjects.length + 1, // 임시 ID 생성
+          name: this.newSubjectName
+        };
+
+        this.subjects.push(newSubject);
+        this.showNewSubjectPopup = false;
+        this.newSubjectName = '';
+        alert('새 문제 세트가 생성되었습니다!');
+
       } catch (error) {
         console.error('문제 세트 생성 중 오류 발생:', error);
         alert('문제 세트 생성 중 오류가 발생했습니다.');
@@ -316,6 +345,8 @@ export default {
       }
 
       try {
+        // 백엔드 연동 코드 주석 처리
+        /*
         // userInfo에서 groupId 가져오기
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const groupId = userInfo?.groupInfo?.groupId;
@@ -350,6 +381,32 @@ export default {
         } else {
           alert('문제 생성에 실패했습니다.');
         }
+        */
+
+        // 프론트엔드에서만 동작하는 코드
+        const selectedSubject = this.subjects.find(s => s.id === this.selectedSubject);
+        
+        // 문제 세트에 추가
+        this.problemSets.push({
+          name: selectedSubject.name,
+          subject: selectedSubject.name,
+          type: this.isLeader ? 'exam' : 'practice',
+          pdfFiles: selectedFiles.map(file => ({ name: file.name })),
+          createdAt: new Date().toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        });
+
+        alert('문제가 생성되었습니다!');
+        
+        // 문제 생성 후 폼 초기화
+        this.selectedSubject = null;
+        this.uploadedFiles = [];
+
       } catch (error) {
         console.error('문제 생성 중 오류 발생:', error);
         alert('문제 생성 중 오류가 발생했습니다.');
@@ -414,6 +471,48 @@ export default {
     }
   },
   created() {
+    // 더미 데이터 추가
+    this.subjects = [
+      { id: 1, name: 'KT Azure Study' },
+      { id: 2, name: 'Leash반 PCCE JAVA 자격증 스터디' }
+    ];
+
+    // 더미 문제 세트 데이터 추가
+    this.problemSets = [
+      {
+        name: 'KT Azure Study',
+        subject: 'KT Azure Study',
+        type: 'exam',
+        pdfFiles: [
+          { name: 'Azure_기초_개념.pdf' },
+          { name: 'Azure_실습_문제.pdf' }
+        ],
+        createdAt: new Date().toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      },
+      {
+        name: 'Leash반 PCCE JAVA 자격증 스터디',
+        subject: 'Leash반 PCCE JAVA 자격증 스터디',
+        type: 'practice',
+        pdfFiles: [
+          { name: 'JAVA_기초_문법.pdf' },
+          { name: 'PCCE_기출_문제.pdf' }
+        ],
+        createdAt: new Date().toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }
+    ];
+
     // 로컬 스토리지에서 사용자 정보 가져오기
     const userInfoStr = localStorage.getItem('userInfo');
     if (userInfoStr) {

@@ -168,6 +168,8 @@ export default {
     // 문제목록 불러오기
     async fetchSubjects() {
       try {
+        // 백엔드 연동 코드 주석 처리
+        /*
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         if (!userInfo || !userInfo.groupInfo || !userInfo.groupInfo.groupId) {
           console.error('사용자 그룹 정보를 찾을 수 없습니다.');
@@ -180,6 +182,43 @@ export default {
         // isCreatedByLeader 값에 따라 연습문제와 시험문제 분리
         this.practiceSubjects = subjects.filter(subject => !subject.isCreatedByLeader);
         this.examSubjects = subjects.filter(subject => subject.isCreatedByLeader);
+        */
+
+        // 더미 데이터 설정
+        this.practiceSubjects = [
+          {
+            id: 1,
+            subjectName: 'KT TECH NEW LEARN - IT핵심기술',
+            createTime: new Date().toISOString(),
+            attachmentNames: ['TECH_기초_개념.pdf', 'TECH_실습_문제.pdf'],
+            isCreatedByLeader: false
+          },
+          {
+            id: 4,
+            subjectName: 'KT TECH NEW LEARN - IT 트렌드',
+            createTime: new Date().toISOString(),
+            attachmentNames: ['IT_트렌드_분석.pdf', '최신_기술_동향.pdf'],
+            isCreatedByLeader: false
+          },
+          {
+            id: 3,
+            subjectName: 'Leash반 PCCE JAVA 자격증 스터디',
+            createTime: new Date().toISOString(),
+            attachmentNames: ['JAVA_기초_문법.pdf', 'PCCE_기출_문제.pdf'],
+            isCreatedByLeader: false
+          }
+        ];
+
+        this.examSubjects = [
+          {
+            id: 2,
+            subjectName: 'KT Azure Study',
+            createTime: new Date().toISOString(),
+            attachmentNames: ['Azure_기초_개념.pdf', 'Azure_실습_문제.pdf'],
+            isCreatedByLeader: true
+          }
+        ];
+
       } catch (error) {
         console.error('문제 목록을 불러오는데 실패했습니다:', error);
       }
