@@ -6,7 +6,7 @@
       <div v-if="userInfo && userInfo.groupInfo" class="group-info">
         <span class="user-name">{{ userInfo.name }}</span>
         <span class="group-badge">{{ userInfo.groupInfo.name }}</span>
-        <span class="role-badge">{{ userInfo.groupInfo.isGroupLeader ? '관리자' : '그룹원' }}</span>
+        <span class="role-badge">{{ userInfo.groupInfo.isLeader ? '관리자' : '그룹원' }}</span>
       </div>
     </div>
     <div class="menu-buttons">
@@ -124,6 +124,7 @@
 
 <script>
 import axios from 'axios'
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'StudentMenu',
@@ -148,7 +149,7 @@ export default {
     //수정필요 : 관리자와 그룹원 정보를 받아와야 가능
     goToStudyStatus() {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      if (userInfo && userInfo.groupInfo && userInfo.groupInfo.isGroupLeader) {
+      if (userInfo && userInfo.groupInfo && userInfo.groupInfo.isLeader) {
         this.$router.push('/managerdashboard');
       } else {
         this.$router.push('/student-dashboard');
@@ -173,7 +174,7 @@ export default {
           return;
         }
 
-        const response = await axios.get(`/subjects?groupId=${userInfo.groupInfo.groupId}`);
+        const response = await axiosInst.get(`/subjects?groupId=${userInfo.groupInfo.groupId}`);
         const subjects = response.data;
         
         // isCreatedByLeader 값에 따라 연습문제와 시험문제 분리

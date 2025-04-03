@@ -83,6 +83,7 @@
 
 <script>
 import axios from 'axios';
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'GroupParticipate',
@@ -109,7 +110,8 @@ export default {
       this.errorMessage = '';
 
       try {
-        const response = await axios.get(`/groups/?groupName=${this.searchQuery}`);
+        const response = await axiosInst.get(`/groups?groupName=${this.searchQuery}`);
+
         if (response.data && Array.isArray(response.data)) {
           this.groups = response.data;
         } else {
@@ -138,14 +140,19 @@ export default {
       }
 
       try {
-        const response = await axios.post(`/groups/${this.selectedGroup.groupId}/members`, {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const userId = userInfo?.userId;
+
+        const response = await axiosInst.post(`/groups/${this.selectedGroup.groupId}/members`, {
+          userId: userId,
           inviteCode: this.inviteCode
         });
 
-        if (response.data) {
+        if (response.status === 200) {
           this.currentGroup = this.selectedGroup;
           this.closePopup();
           this.errorMessage = '';
+          this.$router.push('/group-menu');
         }
       } catch (error) {
         if (error.response && error.response.status === 400) {

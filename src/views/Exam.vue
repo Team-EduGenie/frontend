@@ -94,6 +94,7 @@ url에서 subjectId를 가져옵니다.
 
 <script>
 import axios from 'axios'
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'Exam',
@@ -136,10 +137,12 @@ export default {
 
     try {
       // 해당 과목의 퀴즈 문제들 가져오기
-      const response = await axios.get(`/quizzes?subjectId=${this.subjectId}`);
+      const response = await axiosInst.get(`/quizzes?subjectId=${this.subjectId}`);
+      console.log(response.data);
       this.questions = response.data.map(quiz => ({
+        id: quiz.id,
         question: quiz.question,
-        options: quiz.options,
+        options: quiz.options.split(',').map(option => option.trim()),
         answer: quiz.answer
       }));
     } catch (error) {
