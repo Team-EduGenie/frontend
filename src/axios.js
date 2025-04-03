@@ -1,11 +1,27 @@
 // axios cros origin 설정
 import axios from "axios";
 let config = {
-  baseURL: "/api/v1",
+  baseURL: "/api",
   timeout: 600000,  // 10분으로 변경
   withCredentials: true,
 };
 const axiosInst = axios.create(config);
+
+axiosInst.interceptors.request.use(
+    (config) => {
+        const userInfo = localStorage.getItem('userInfo');
+        if (userInfo) {
+            const { accessToken } = JSON.parse(userInfo);
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 export default axiosInst;
 

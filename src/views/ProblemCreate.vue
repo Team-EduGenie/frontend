@@ -158,6 +158,7 @@
 
 <script>
 import axios from 'axios';
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'ProblemCreate',
@@ -273,16 +274,16 @@ export default {
         // 백엔드로 보낼 데이터 준비
         const requestData = {
           groupId,
-          subjectName: this.newSubjectName
+          title: this.newSubjectName
         };
 
         // API 호출
-        const response = await axios.post('/createNewsubject', requestData);
+        const response = await axiosInst.post('/subjects', requestData);
 
-        if (response.data.success) {
+        if (response.status === 200) {
           // 새 과목을 subjects 배열에 추가
           const newSubject = {
-            id: response.data.subjectId, // 백엔드에서 생성된 ID 사용
+            id: response.data.id, // 백엔드에서 생성된 ID 사용
             name: this.newSubjectName
           };
 
@@ -368,12 +369,12 @@ export default {
     },
     async fetchSubjects(groupId) {
       try {
-        const response = await axios.get('/subjects', {
+        const response = await axiosInst.get('/subjects', {
           params: { groupId }
         });
 
-        if (response.data.success) {
-          this.subjects = response.data.subjects.map(subject => ({
+        if (response.status === 200) {
+          this.subjects = response.data.map(subject => ({
             id: subject.id,
             name: subject.name
           }));
@@ -390,7 +391,7 @@ export default {
           params: { groupId }
         });
 
-        if (response.data.success) {
+        if (response.status === 200) {
           this.problemSets = response.data.quizSets.map(set => ({
             name: set.subjectName,
             subject: set.subjectName,

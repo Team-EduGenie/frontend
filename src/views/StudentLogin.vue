@@ -9,7 +9,7 @@
         <span class="input-icon">👤</span>
         <input 
           type="text" 
-          v-model="username" 
+          v-model="userId"
           placeholder="아이디를 입력해주세요" 
           class="login-input"
         >
@@ -43,13 +43,13 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'StudentLogin',
   data() {
     return {
-      username: '',
+      userId: '',
       password: '',
       errorMessage: '',
       showError: false
@@ -58,8 +58,8 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        const response = await axios.post('/auth', {
-          username: this.username,
+        const response = await axiosInst.post('/auth', {
+          userId: this.userId,
           password: this.password
         });
 
@@ -67,7 +67,7 @@ export default {
           // 사용자 정보를 localStorage에 저장
           localStorage.setItem('userInfo', JSON.stringify(response.data));
           // 로그인 성공 시 studentmenu로 이동
-          this.$router.push('/studentmenu');
+          this.$router.push('/group-menu');
         }
       } catch (error) {
         if (error.response && error.response.status === 401) {

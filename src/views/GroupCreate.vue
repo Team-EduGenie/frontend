@@ -57,6 +57,7 @@
 
 <script>
 import axios from 'axios';
+import axiosInst from "@/axios.js";
 
 export default {
   name: 'GroupCreate',
@@ -80,7 +81,10 @@ export default {
       }
       
       try {
-        const response = await axios.post('/groups', {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const userId = userInfo?.userId;
+        const response = await axiosInst.post('/groups', {
+          userId: userId,
           groupName: this.groupName
         });
 
