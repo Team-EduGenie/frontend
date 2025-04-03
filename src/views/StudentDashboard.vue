@@ -169,10 +169,10 @@ export default {
     return {
       selectedSet: null,
       problemSets: [
-        { id: 1, name: 'tech new-learn - IT 트렌드', score: 8 },
-        { id: 2, name: 'tech new-learn - IT핵심기술', score: 9 },
-        { id: 3, name: 'kt azure study', score: 3 },
-        { id: 4, name: 'leash반 pcce java study', score: 6 }
+        { id: 1, name: 'KT TECH NEW LEARN - IT핵심기술', score: 9 },
+        { id: 2, name: 'KT TECH NEW LEARN - IT 트렌드', score: 8 },
+        { id: 3, name: 'Leash반 PCCE JAVA 자격증 스터디', score: 6 },
+        { id: 4, name: 'KT Azure Study', score: 3 }
       ],
       wrongQuizzes: [],
       chart: null,
