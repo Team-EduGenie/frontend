@@ -94,6 +94,9 @@ export default {
           params: { userId }
         });
 
+        console.log("myGroup")
+        console.log(response.data);
+
         this.groups = response.data;
         console.log('Received groups:', this.groups);
 
@@ -102,13 +105,21 @@ export default {
       }
     },
     selectGroup(groupId) {
-      // 그룹 선택 시 localStorage에 저장하고 메인 메뉴로 이동
+      // 선택한 그룹 찾기
+      const selectedGroup = this.groups.find(g => g.id === groupId);
+      
+      // userInfo 업데이트
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
       userInfo.groupInfo = {
-        groupId,
-        isLeader: this.groups.find(g => g.groupId === groupId)?.isLeader || false
+        groupId: selectedGroup.id,
+        name: selectedGroup.name,
+        isLeader: selectedGroup.isLeader // 서버에서 받은 isLeader 값 사용
       };
+      
+      // 업데이트된 userInfo를 localStorage에 저장
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      
+      // 메인 메뉴로 이동
       this.$router.push('/studentmenu');
     }
   },
